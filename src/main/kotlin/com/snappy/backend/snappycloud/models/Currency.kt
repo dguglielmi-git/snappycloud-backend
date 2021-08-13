@@ -8,8 +8,8 @@ import javax.persistence.Id
 @Entity
 data class Currency(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
     val name: String,
-    val symbol: String
+    var symbol: String
 )

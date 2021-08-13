@@ -6,7 +6,7 @@ import javax.persistence.*
 @Entity
 data class Purchase(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
     val quantity: Double,
     @Column(name = "current_cost")
@@ -18,12 +18,12 @@ data class Purchase(
     @Column(name = "last_stock")
     val lastStock: Double,
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "purchase_user_fk")
     val user: User,
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "material_id")
+    @JoinColumn(name = "purchase_material_fk")
     val material: Material,
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "purchase_product_fk")
     val product: Product
 )

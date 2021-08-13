@@ -5,30 +5,30 @@ import javax.persistence.*
 @Entity
 data class Supplier(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
-    val name: String,
-    val address: String?,
-    val city: String?,
-    val state: String?,
-    val zipCode: String?,
-    val phone: String?,
-    val fax: String?,
-    val email: String?,
-    val website: String?,
+    var name: String,
+    var address: String?,
+    var city: String?,
+    var state: String?,
+    var zipCode: String?,
+    var phone: String?,
+    var fax: String?,
+    var email: String?,
+    var website: String?,
     @Column(name = "mobile_phone")
-    val mobilePhone: String?,
+    var mobilePhone: String?,
     @Column(name = "alternative_phone")
-    val alternativePhone: String?,
+    var alternativePhone: String?,
     @Column(name = "contact_name")
-    val contactName: String?,
+    var contactName: String?,
     @Column(name = "ordering_date")
-    val OrderingDate: String?,
+    var OrderingDate: String?,
     @Column(name = "delivery_days")
-    val deliveryDays: String?,
+    var deliveryDays: String?,
     @Column(name = "delivery_hours")
-    val deliveryHours: String?,
+    var deliveryHours: String?,
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "business_id")
-    val business: Business
+    @JoinColumn(name = "supplier_business_fk")
+    var business: Business
 )

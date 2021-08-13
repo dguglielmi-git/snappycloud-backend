@@ -1,14 +1,12 @@
 package com.snappy.backend.snappycloud.models
 
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
+import javax.persistence.*
 
 @Entity
+@Table(name = "document_type")
 data class DocumentType(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
     val description: String
 )

@@ -13,14 +13,15 @@ import javax.persistence.*
  */
 
 @Entity
+@Table(name = "product_item")
 data class ProductItem(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
-    val quantity: Double,
+    var quantity: Double,
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "material_id")
-    val material: Material
+    @JoinColumn(name = "proditem_material_fk")
+    var material: Material
 ) {
     fun getCost() = material.unitPrice * quantity
 }

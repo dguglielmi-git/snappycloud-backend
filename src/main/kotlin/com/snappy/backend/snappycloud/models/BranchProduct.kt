@@ -3,20 +3,23 @@ package com.snappy.backend.snappycloud.models
 import javax.persistence.*
 
 @Entity
+@Table(name = "branch_product")
 data class BranchProduct(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
-    @JoinColumn(name = "branch_office_id")
-    val branchOffice: BranchOffice,
-    @JoinColumn(name = "product_id")
-    val product: Product,
     @Column(name = "stock_alert_min")
-    val stockAlertMin: Double,
+    var stockAlertMin: Double,
     @Column(name = "stock_return")
-    val stockReturn: Double,
+    var stockReturn: Double,
     @Column(name = "stock_available")
-    val stockAvailable: Double,
+    var stockAvailable: Double,
     @Column(name = "stock_physical")
-    val stockPhysical: Double
+    var stockPhysical: Double,
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "branch_office_fk")
+    val branchOffice: BranchOffice,
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bp_product_fk")
+    val product: Product
 )

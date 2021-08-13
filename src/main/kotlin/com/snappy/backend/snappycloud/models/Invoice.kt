@@ -5,28 +5,22 @@ import javax.persistence.*
 @Entity
 data class Invoice(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
     val number: Int,
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name ="client_id")
-    val client: Client,
+    @JoinColumn(name ="invoice_client_fk")
+    var client: Client?,
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sales_condition_id")
-    val saleCondition: SaleCondition,
+    @JoinColumn(name = "invoice_currency_fk")
+    var currency: Currency,
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "currency_id")
-    val currency: Currency,
+    @JoinColumn(name = "invoice_carrier_fk")
+    var carrier: Carrier?,
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "carrier_id")
-    val carrier: Carrier,
+    @JoinColumn(name = "invoice_doc_type_fk")
+    var docType: DocumentType,
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sale_id")
-    val sale: Sale,
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "doc_type_id")
-    val docType: DocumentType,
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "remittance_id")
-    val remittance: Remittance
+    @JoinColumn(name = "invoice_remittance_fk")
+    var remittance: Remittance?
 )

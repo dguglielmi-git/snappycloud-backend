@@ -6,20 +6,17 @@ import javax.persistence.*
 @Entity
 data class Remittance(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
     @Column(name ="issue_date")
     val issueDate: Date,
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id")
-    val client: Client,
+    var client: Client,
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sales_condition_id")
-    val salesCondition: SaleCondition,
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "branch_office_id")
-    val branchOffice: BranchOffice,
+    @JoinColumn(name = "remittance_branch_office_fk")
+    var branchOffice: BranchOffice,
     @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
-    @JoinColumn(name = "remittance_fk")
+    @JoinColumn(name = "remittance_items_fk")
     val remittanceItem: List<RemittanceItem> = mutableListOf<RemittanceItem>()
 )

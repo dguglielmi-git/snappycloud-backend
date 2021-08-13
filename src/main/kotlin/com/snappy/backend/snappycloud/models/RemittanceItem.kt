@@ -3,18 +3,19 @@ package com.snappy.backend.snappycloud.models
 import javax.persistence.*
 
 @Entity
+@Table(name = "remittance_item")
 data class RemittanceItem(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
-    val product: Product,
     @Column(name = "unit_price")
-    val unitPrice: Double,
-    val quantity: Int,
-    val total: Double,
+    var unitPrice: Double,
+    var quantity: Int,
+    var total: Double,
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sale_type_id")
-    val saleType: SaleType
+    @JoinColumn(name = "remittance_item_product_fk")
+    var product: Product,
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "remittance_sale_type_fk")
+    var saleType: SaleType
 )

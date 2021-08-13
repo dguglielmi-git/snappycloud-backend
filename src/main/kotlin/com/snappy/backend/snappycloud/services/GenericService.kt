@@ -1,8 +1,5 @@
 package com.snappy.backend.snappycloud.services
 
-/**
- * Generic Service structure
- */
 interface GenericService<T, ID> {
     fun findAll(): List<T>
     fun findById(id: ID): T?

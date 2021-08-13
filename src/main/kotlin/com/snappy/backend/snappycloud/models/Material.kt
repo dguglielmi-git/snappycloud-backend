@@ -7,25 +7,25 @@ import javax.persistence.*
 @Entity
 data class Material(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
-    val description: String,
+    var description: String,
     @Column(name = "unit_quantity")
-    val unitQuantity: Double,
+    var unitQuantity: Double,
     @Column(name = "unit_price")
-    val unitPrice: Double,
+    var unitPrice: Double,
     @Column(name = "stock_alert")
-    val stockAlert: Double,
+    var stockAlert: Double,
     @Column(name = "stock_expected")
-    val stockExpected: Double,
+    var stockExpected: Double,
     @Column(name = "stock_available")
-    val stockAvailable: Double,
+    var stockAvailable: Double,
     @Column(name = "last_update")
-    val lastUpdate: Date,
+    var lastUpdate: Date,
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "business_id")
+    @JoinColumn(name = "material_business_fk")
     val business: Business,
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "measure_id")
-    val measure: UnitMeasure
+    @JoinColumn(name = "material_measure_fk")
+    var measure: UnitMeasure
 )

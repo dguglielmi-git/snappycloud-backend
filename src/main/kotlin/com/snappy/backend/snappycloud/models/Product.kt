@@ -6,52 +6,50 @@ import javax.persistence.*
 @Entity
 data class Product(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
-    val barcode: String?,
-    val description: String,
+    var barcode: String?,
+    var description: String,
     @Column(name = "total_cost")
-    val totalCost: Double,
+    var totalCost: Double,
     @Column(name = "short_description")
-    val shortDescription: String,
+    var shortDescription: String,
     @Column(name = "flag_percentage")
-    val flagPercentage: Int?,
+    var flagPercentage: Int?,
     @Column(name = "img_product")
-    val imgProduct: String?,
-    @Column(name ="percentage_earning_expected")
-    val percentageEarningExpected: Double,
-    @Column(name ="percentage_earning_wholesale")
-    val percentageEarningWholesale: Double,
-    @Column(name ="percentage_earning_retail")
-    val percentageEarningRetail: Double,
+    var imgProduct: String?,
+    @Column(name = "percentage_earning_expected")
+    var percentageEarningExpected: Double?,
+    @Column(name = "percentage_earning_wholesale")
+    var percentageEarningWholesale: Double?,
+    @Column(name = "percentage_earning_retail")
+    var percentageEarningRetail: Double?,
     @Column(name = "sale_price_special")
-    val salePriceSpecial: Double,
+    var salePriceSpecial: Double,
     @Column(name = "sale_price_wholesale")
-    val salePriceWholesale: Double,
+    var salePriceWholesale: Double,
     @Column(name = "sale_price_retail")
-    val salePriceRetail: Double,
+    var salePriceRetail: Double,
     @Column(name = "price_last_update")
-    val priceLastUpdate: Date,
+    var priceLastUpdate: Date,
     @Column(name = "product_last_update")
-    val productLastUpdate: Date,
+    var productLastUpdate: Date,
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sales_type_default")
-    val saleTypeDefault: SaleType,
+    @JoinColumn(name = "prod_sales_type_fk")
+    var saleTypeDefault: SaleType,
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "main_supplier")
-    val mainSupplier: Supplier,
+    @JoinColumn(name = "prod_main_supplier_fk")
+    var mainSupplier: Supplier,
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "business_id")
+    @JoinColumn(name = "prod_business_fk")
     val business: Business,
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    val category: Category,
+    @JoinColumn(name = "prod_category_fk")
+    var category: Category,
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "brand_id")
-    val brand: Brand,
+    @JoinColumn(name = "prod_brand_fk")
+    var brand: Brand,
     @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(name = "product_item_fk")
-    val productItems: List<ProductItem> = mutableListOf<ProductItem>(),
-
-
-    )
+    val productItems: List<ProductItem> = mutableListOf<ProductItem>()
+)

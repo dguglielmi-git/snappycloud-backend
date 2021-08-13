@@ -5,9 +5,10 @@ import javax.persistence.*
 @Entity
 data class Category(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
-    val description: String,
-    @JoinColumn(name = "business_id")
+    var description: String,
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_business_fk")
     val business: Business
 )

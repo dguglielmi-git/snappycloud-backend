@@ -1,14 +1,14 @@
 package com.snappy.backend.snappycloud.models
 
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
+import javax.persistence.*
 
 @Entity
 data class Position(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
-    val description: String
+    var description: String,
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "position_business_fk")
+    val business: Business
 )

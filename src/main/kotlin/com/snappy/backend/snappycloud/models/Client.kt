@@ -6,53 +6,50 @@ import javax.persistence.*
 @Entity
 data class Client(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
-    val name: String,
-    val surname: String,
-    val address: String,
-    val apartment: String?,
-    val floor: String?,
-    val city: String,
-    val state: String,
-    val zipCode: String,
-    val dni: String?,
-    val email: String?,
-    val phone: String?,
-    val mobile: String?,
+    var name: String,
+    var surname: String,
+    var address: String? = "",
+    var apartment: String? = "",
+    var floor: String? = "",
+    var city: String? = "",
+    var state: String? = "",
+    var zipCode: String? = "",
+    var dni: String? = "",
+    var email: String? = "",
+    var phone: String? = "",
+    var mobile: String? = "",
     @Column(name = "mobile_corp")
-    val mobileCorp: String?,
+    var mobileCorp: String? = "",
     @Column(name = "cuit_nino_ssn")
-    val cuitNinoSsn: String?,
+    var cuitNinoSsn: String? = "",
     @Column(name = "cuit_nino_ssn_corp")
-    val cuitNinoSsnCorp: String?,
+    var cuitNinoSsnCorp: String? = "",
     @Column(name = "issue_date_system")
     val issueDateSystem: Date,
     @Column(name = "last_update")
-    val lastUpdate: Date,
+    var lastUpdate: Date,
     @Column(name = "num_iibb")
-    val iibb: String?,
+    var iibb: String? = "",
     @Column(name = "company_name")
-    val companyName: String?,
+    var companyName: String? = "",
     @Column(name = "balance_last_update")
-    val balanceLastUpdate: Date,
+    var balanceLastUpdate: Date,
     @Column(name = "balance_debit")
-    val balanceDebit: Double,
+    var balanceDebit: Double,
     @Column(name = "balance_credit")
-    val balanceCredit: Double,
+    var balanceCredit: Double,
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "position_id")
-    val position: Position,
+    @JoinColumn(name = "client_position_fk")
+    var position: Position,
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "country_id")
-    val country: Country,
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vat_condition_id")
-    val vatCondition: VatCondition,
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_currency_id")
-    val clientCurrency: Currency,
+    @JoinColumn(name = "client_country_fk")
+    var country: Country,
     @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(name = "client_tax_fk")
-    val clientTax: List<Tax> = mutableListOf<Tax>()
+    var clientTax: List<Tax> = mutableListOf<Tax>(),
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "client_business_fk")
+    val business: Business
 )

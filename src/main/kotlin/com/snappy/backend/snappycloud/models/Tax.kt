@@ -1,15 +1,15 @@
 package com.snappy.backend.snappycloud.models
 
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
+import javax.persistence.*
 
 @Entity
 data class Tax(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
-    val description: String,
-    val percentage: Double
+    var description: String,
+    var percentage: Double,
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tax_business_fk")
+    val business: Business
 )

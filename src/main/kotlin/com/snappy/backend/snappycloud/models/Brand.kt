@@ -5,9 +5,10 @@ import javax.persistence.*
 @Entity
 data class Brand(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
     val description: String,
-    @JoinColumn(name="business_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "brand_business_fk")
     val business: Business
 )

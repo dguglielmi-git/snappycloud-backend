@@ -10,51 +10,25 @@ import javax.validation.constraints.Size
 data class User(
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    val id: Long,
+    val id: Long = 0,
+    @Column(name = "employee_code")
+    var employeeCode: String? = null,
     @get:Size(max = 50)
+    @Column(name = "username", unique = true)
     val username: String,
-    val name: String,
-    val surname: String,
-    val email: String,
-    val active: Int,
+    @JsonIgnore
+    var password: String,
+    var name: String,
+    var surname: String,
+    var email: String,
+    var active: Int,
     @Column(name = "issue_date")
     val issueDate: Date,
-    @Column(name = "employee_code")
-    val employeeCode: String?,
     @Column(name = "dni_ssn_nino")
-    val dniSsnNino: String?,
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_profile")
-    val profile: Profile,
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "business_id")
-    val business: Business
-) {
-    @Column(name = "password")
-    var password = ""
-        @JsonIgnore
-        get() = field
-        set(value) {
-            val passwordEncoder = BCryptPasswordEncoder()
-            field = passwordEncoder.encode(value)
-        }
-
-    fun comparePassword(password: String): Boolean {
-        val passwordEncoder = BCryptPasswordEncoder()
-        return BCryptPasswordEncoder().matches(password, this.password)
-    }
-
-    override fun equals(other: Any?): Boolean {
-        other ?: return false
-        if (other === this) return true
-        if (this.javaClass != other.javaClass) return false
-        other as User
-
-        return this.id == other.id
-    }
-
-    override fun hashCode(): Int {
-        return id.hashCode()
-    }
-
-}
+    var dniSsnNino: String? = null,
+    @ManyToMany(fetch = FetchType.EAGER)
+    var profiles: MutableList<Profile?> = mutableListOf(),
+    @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @JoinColumn(name = "user_owner_business_fk")
+    var business: List<Business> = mutableListOf<Business>()
+)
