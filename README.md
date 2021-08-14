@@ -1,6 +1,9 @@
 
 # Snappy Cloud :: (Backend)
-![Logo](./Logo.png)
+<p align="center">
+  <img width="460" height="300" src="https://github.com/dguglielmi-git/snappycloud-backend/Logo.png">
+</p>
+
 Snappy is a business application developed for managing retail businesses. This repository only contains the code of the backend.
 Once the projects are progressing, we will be sharing the links of the rest of the repositories.
 
