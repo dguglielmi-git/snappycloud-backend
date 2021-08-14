@@ -18,15 +18,15 @@ class ProfileController(
 ) {
 
     @PostMapping("/profile/save")
-    fun saveProfile(@RequestBody profileName: Profile): ResponseEntity<Profile>{
+    fun saveProfile(@RequestBody profile: Profile): ResponseEntity<Profile>{
         val uri: URI =
             URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/profile/save").toUriString())
-        return ResponseEntity.created(uri).body(profileService.save(profileName))
+        return ResponseEntity.created(uri).body(profileService.save(profile))
     }
 
     @PostMapping("/profile/addtouser")
     fun addProfileToUser(@RequestBody form: ProfileToUserDTO): ResponseEntity<Any> {
-        profileService.addProfileToUser(form.username, form.profileName)
+        profileService.addProfileToUser(form.username, form.name)
         return ResponseEntity.ok().build()
     }
 }

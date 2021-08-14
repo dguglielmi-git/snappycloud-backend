@@ -3,11 +3,17 @@ package com.snappy.backend.snappycloud.services
 import com.snappy.backend.snappycloud.models.User
 import com.snappy.backend.snappycloud.repositories.UserRepository
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
 import javax.persistence.EntityNotFoundException
+import javax.transaction.Transactional
 
 @Service
-class UserService(private val userRepository: UserRepository) : GenericService<User, Long> {
+@Transactional
+class UserService(private val userRepository: UserRepository) : UserDetailsService, GenericService<User, Long> {
 
     override fun save(user: User) = this.userRepository.save(user)
 
@@ -30,5 +36,16 @@ class UserService(private val userRepository: UserRepository) : GenericService<U
         return this.findById(id)?.apply {
             this@UserService.userRepository.deleteById(id)
         } ?: throw EntityNotFoundException("$id does not exist")
+    }
+
+    @Throws(UsernameNotFoundException::class)
+    override fun loadUserByUsername(username: String): UserDetails {
+        val user: User? = userRepository.findByUsername(username)
+        val authorities = mutableListOf<SimpleGrantedAuthority>()
+
+        if (user != null) {
+            user.profiles.forEach { profile -> authorities.add(SimpleGrantedAuthority(profile!!.name)) }
+            return org.springframework.security.core.userdetails.User(user.username, user.password, authorities)
+        } else throw UsernameNotFoundException("User not found in the database")
     }
 }

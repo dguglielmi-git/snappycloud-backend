@@ -29,10 +29,11 @@ class SnappyAuthorizationFilter : OncePerRequestFilter() {
             if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
                 try {
                     val token: String = authorizationHeader.substring("Bearer ".length)
-                    val algorithm: Algorithm = Algorithm.HMAC256("secret".toByteArray())
+                    val algorithm: Algorithm = Algorithm.HMAC256(System.getenv("SECRET_SNAPPY").toByteArray())
                     val verifier: JWTVerifier = JWT.require(algorithm).build()
                     val decodedJWT: DecodedJWT = verifier.verify(token)
                     val username: String = decodedJWT.subject
+
                     val profiles = decodedJWT.getClaim("profiles").asArray(String::class.java).toMutableList()
                     val authorities = mutableListOf<SimpleGrantedAuthority>()
                     profiles.forEach { profile -> authorities.add(SimpleGrantedAuthority(profile)) }

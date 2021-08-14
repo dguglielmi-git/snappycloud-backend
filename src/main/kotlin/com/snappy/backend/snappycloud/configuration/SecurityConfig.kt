@@ -21,6 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 class SecurityConfig(
     val userDetailsService: UserDetailsService,
 ) : WebSecurityConfigurerAdapter() {
+
     private val bCryptPasswordEncoder: BCryptPasswordEncoder = BCryptPasswordEncoder()
 
     @Throws
@@ -38,9 +39,13 @@ class SecurityConfig(
         http.authorizeRequests().antMatchers("/api/login/**", "/api/token/refresh").permitAll()
         http.authorizeRequests().antMatchers(GET, "/api/users/**").hasAnyAuthority("ROLE_USER")
         http.authorizeRequests().antMatchers(POST, "/api/user/save/**").hasAnyAuthority("ROLE_ADMIN")
+        http.authorizeRequests().antMatchers(POST,
+            "/api/profile/save/**", "/api/profile/addtouser/**")
+            .hasAnyAuthority("ROLE_ADMIN")
         http.authorizeRequests().anyRequest().authenticated()
         http.addFilter(snappyAuthenticationFilter)
-        http.addFilterBefore(SnappyAuthorizationFilter(), UsernamePasswordAuthenticationFilter::class.java)
+        http.addFilterBefore(SnappyAuthorizationFilter(),
+            UsernamePasswordAuthenticationFilter::class.java)
     }
 
     @Bean

@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletResponse
 class UserController(
     private val userService: UserService,
 ) {
-    private val tokenUtils = TokenUtils()
+    val tokenUtils = TokenUtils()
 
     @GetMapping("/users")
     fun getUsers(): ResponseEntity<List<User>> = ResponseEntity.ok().body(userService.findAll())
@@ -45,25 +45,9 @@ class UserController(
         val authorizationHeader: String? = request.getHeader(AUTHORIZATION)
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             try {
-                val algorithm: Algorithm = Algorithm.HMAC256("secret".toByteArray())
-
-                val refresh_token: String = authorizationHeader.substring("Bearer ".length)
-
-                val verifier: JWTVerifier = JWT.require(algorithm).build()
-                val decodedJWT: DecodedJWT = verifier.verify(refresh_token)
-                val username: String = decodedJWT.subject
-                val user: User? = userService.findByUsername(username)
-
-                val access_token: String = JWT.create()
-                    .withSubject(user?.username)
-                    .withExpiresAt(Date(System.currentTimeMillis() + 10 * 60 * 1000))
-                    .withIssuer(request.requestURL.toString())
-                    .withClaim("profiles", user?.profiles)
-                    .sign(algorithm)
-
-                val tokens = mutableMapOf<String, String>()
-                tokens.put("access_token", access_token)
-                tokens.put("refresh_token", refresh_token)
+                tokenUtils.service = userService
+                val url: String = request.requestURL.toString()
+                val tokens = tokenUtils.getRefreshToken(authorizationHeader, url)
                 response.contentType = APPLICATION_JSON_VALUE
                 ObjectMapper().writeValue(response.outputStream, tokens)
             } catch (ex: Exception) {

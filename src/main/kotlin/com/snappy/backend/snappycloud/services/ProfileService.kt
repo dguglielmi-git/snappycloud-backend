@@ -4,37 +4,42 @@ import com.snappy.backend.snappycloud.models.Profile
 import com.snappy.backend.snappycloud.models.User
 import com.snappy.backend.snappycloud.repositories.ProfileRepository
 import com.snappy.backend.snappycloud.repositories.UserRepository
+import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.stereotype.Service
+import javax.persistence.EntityNotFoundException
+import javax.transaction.Transactional
 
 @Service
+@Transactional
 class ProfileService(
     private val userRepository: UserRepository,
     private val profileRepository: ProfileRepository
-) : GenericService<Profile,Long> {
+): GenericService<Profile,Long> {
+
+    override fun findAll(): List<Profile> = this.profileRepository.findAll()
+
+    override fun findById(id: Long): Profile? = this.profileRepository.findByIdOrNull(id)
+
+    override fun save(profile: Profile): Profile = this.profileRepository.save(profile)
+
+    override fun update(profile: Profile): Profile {
+        return if (this.profileRepository.existsById(profile.id))
+            this.profileRepository.save(profile)
+        else throw EntityNotFoundException("${profile.id} does not exist")
+    }
+
+    override fun deleteById(id: Long): Profile  {
+        return this.findById(id).apply {
+            this@ProfileService.profileRepository.deleteById(id)
+        } ?: throw EntityNotFoundException("$id does not exist")
+    }
 
     fun addProfileToUser(username: String, profileName: String) {
         val user: User? = userRepository.findByUsername(username)
-        val profile: Profile? = profileRepository.findByName(profileName)
+        val profile: Profile? = this.profileRepository.findByName(profileName)
         user?.profiles?.add(profile)
     }
 
-    override fun findAll(): List<Profile> {
-        TODO("Not yet implemented")
-    }
 
-    override fun findById(id: Long): Profile? {
-        TODO("Not yet implemented")
-    }
-
-    override fun save(t: Profile): Profile {
-        TODO("Not yet implemented")
-    }
-
-    override fun update(t: Profile): Profile {
-        TODO("Not yet implemented")
-    }
-
-    override fun deleteById(id: Long): Profile {
-        TODO("Not yet implemented")
-    }
 }
