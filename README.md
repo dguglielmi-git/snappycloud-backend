@@ -1,8 +1,8 @@
 
 # Snappy Cloud :: (Backend)
-< align="center">
+<p align="center">
   <img alignt="center" src="https://res.cloudinary.com/littleamsterdam/image/upload/v1628970740/github/Logo_small_xs0jj8.png">
-</>
+</p>
 
 Snappy is a business application developed for managing retail businesses. This repository only contains the code of the backend.
 Once the projects are progressing, we will be sharing the links of the rest of the repositories.
