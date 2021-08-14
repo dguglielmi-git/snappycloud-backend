@@ -7,15 +7,23 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import javax.persistence.EntityNotFoundException
 import javax.transaction.Transactional
 
 @Service
 @Transactional
-class UserService(private val userRepository: UserRepository) : UserDetailsService, GenericService<User, Long> {
+class UserService(
+    private val userRepository: UserRepository,
+) : UserDetailsService, GenericService<User, Long> {
+    private val passwordEncoder: PasswordEncoder = BCryptPasswordEncoder()
 
-    override fun save(user: User) = this.userRepository.save(user)
+    override fun save(user: User): User {
+        user.password = passwordEncoder.encode(user.password)
+        return this.userRepository.save(user)
+    }
 
     fun getById(id: Long): User? = this.userRepository.getById(id)
 
@@ -44,7 +52,7 @@ class UserService(private val userRepository: UserRepository) : UserDetailsServi
         val authorities = mutableListOf<SimpleGrantedAuthority>()
 
         if (user != null) {
-            user.profiles.forEach { profile -> authorities.add(SimpleGrantedAuthority(profile!!.name)) }
+            user.profiles?.forEach { profile -> authorities.add(SimpleGrantedAuthority(profile.name)) }
             return org.springframework.security.core.userdetails.User(user.username, user.password, authorities)
         } else throw UsernameNotFoundException("User not found in the database")
     }

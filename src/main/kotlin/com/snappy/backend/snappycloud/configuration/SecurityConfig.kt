@@ -37,7 +37,7 @@ class SecurityConfig(
         http.csrf().disable()
         http.sessionManagement().sessionCreationPolicy(STATELESS)
         http.authorizeRequests().antMatchers("/api/login/**", "/api/token/refresh").permitAll()
-        http.authorizeRequests().antMatchers(GET, "/api/users/**").hasAnyAuthority("ROLE_USER")
+        http.authorizeRequests().antMatchers(GET, "/api/users/**").hasAnyAuthority("ROLE_ROOT", "ROLE_USER")
         http.authorizeRequests().antMatchers(POST, "/api/user/save/**").hasAnyAuthority("ROLE_ADMIN")
         http.authorizeRequests().antMatchers(POST,
             "/api/profile/save/**", "/api/profile/addtouser/**")

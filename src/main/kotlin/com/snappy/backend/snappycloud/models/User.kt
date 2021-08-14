@@ -23,12 +23,12 @@ data class User(
     var email: String,
     var active: Int,
     @Column(name = "issue_date")
-    val issueDate: Date,
+    val issueDate: Calendar,
     @Column(name = "dni_ssn_nino")
     var dniSsnNino: String? = null,
     @ManyToMany(fetch = FetchType.EAGER)
-    var profiles: MutableList<Profile?> = mutableListOf(),
+    var profiles: MutableList<Profile>? = mutableListOf<Profile>(),
     @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(name = "user_owner_business_fk")
-    var business: List<Business> = mutableListOf<Business>()
+    var business: List<Business>? = mutableListOf<Business>()
 )

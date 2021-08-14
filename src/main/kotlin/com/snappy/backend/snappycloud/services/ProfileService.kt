@@ -14,8 +14,8 @@ import javax.transaction.Transactional
 @Transactional
 class ProfileService(
     private val userRepository: UserRepository,
-    private val profileRepository: ProfileRepository
-): GenericService<Profile,Long> {
+    private val profileRepository: ProfileRepository,
+) : GenericService<Profile, Long> {
 
     override fun findAll(): List<Profile> = this.profileRepository.findAll()
 
@@ -29,7 +29,7 @@ class ProfileService(
         else throw EntityNotFoundException("${profile.id} does not exist")
     }
 
-    override fun deleteById(id: Long): Profile  {
+    override fun deleteById(id: Long): Profile {
         return this.findById(id).apply {
             this@ProfileService.profileRepository.deleteById(id)
         } ?: throw EntityNotFoundException("$id does not exist")
@@ -38,7 +38,7 @@ class ProfileService(
     fun addProfileToUser(username: String, profileName: String) {
         val user: User? = userRepository.findByUsername(username)
         val profile: Profile? = this.profileRepository.findByName(profileName)
-        user?.profiles?.add(profile)
+        if (profile != null) user?.profiles?.add(profile)
     }
 
 
