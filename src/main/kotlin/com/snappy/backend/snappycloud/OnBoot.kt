@@ -24,7 +24,7 @@ class OnBoot(
         userService.save(User(0,
             null,
             "dguglielmi",
-            "newTh8izhanlv",
+            "password",
             "Daniel",
             "Guglielmi",
             "dag@danielguglielmi.dev",
