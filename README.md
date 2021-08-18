@@ -17,11 +17,11 @@ Snappy Architecture combines several technologies, and it is divided in differen
 
 *Notes: The [Snappy Standalone Application](#) is being migrated from its old version written in Java. It is currently deprecated and no more available for downloading.
 
-# Business Architecture
--pending image-
+# Components Architecture
+![Architecture](./architectureDesign.png)
 
 # Database Model
-![Architecture](./diagramModel.png)
+![DiagramModel](./diagramModel.png)
 
 ## Getting Started 🚀
 
