@@ -3,6 +3,7 @@ package com.snappy.backend.snappycloud
 import com.snappy.backend.snappycloud.utils.UsersLogged
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import org.springframework.util.Assert
 
 class RoleTest {
 
@@ -98,5 +99,36 @@ class RoleTest {
         val result = UsersLogged.hasProfile("dguglielmi", profiles, 1)
 
         Assertions.assertEquals(true, result)
+    }
+
+    @Test
+    fun `Test - Remove an user`() {
+        UsersLogged.addUser("testing")
+        UsersLogged.addUser("john")
+        UsersLogged.removeUser("testing")
+
+        val result = UsersLogged.isUser("testing")
+
+        Assertions.assertEquals(false,result)
+    }
+
+    @Test
+    fun `Test - Check if User Exists`() {
+        UsersLogged.addUser("testing")
+        UsersLogged.addUser("john")
+
+        val result = UsersLogged.isUser("testing")
+
+        Assertions.assertEquals(true,result)
+    }
+
+    @Test
+    fun `Test - Check if User Does not exists`() {
+        UsersLogged.addUser("testing")
+        UsersLogged.addUser("john")
+
+        val result = UsersLogged.isUser("jack")
+
+        Assertions.assertEquals(false,result)
     }
 }

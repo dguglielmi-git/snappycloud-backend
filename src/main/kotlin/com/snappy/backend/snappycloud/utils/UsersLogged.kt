@@ -8,6 +8,7 @@ object UsersLogged {
     fun addUser(user: String) {
         val userBody = UserSnappy()
         this.users.put(user, userBody)
+        println("User: $user logged in.")
     }
 
     fun removeUser(user: String) = this.users.remove(user)
@@ -26,7 +27,6 @@ object UsersLogged {
         return result
     }
 
-
     fun addProfile(username: String, profile: String, businessId: Long) {
         val user = getUser(username)
         if (user != null) {
@@ -35,10 +35,12 @@ object UsersLogged {
         }
     }
 
+    fun isUser(username: String): Boolean = (getUser(username) != null)
+
+
     fun getProfiles(username: String, businessId: Long): Array<String>? {
         val user = this.getUser(username)
         return if (user != null) user.getProfiles(businessId)?.sortedArray() else null
     }
-
 
 }
