@@ -17,8 +17,8 @@ Snappy Architecture combines several technologies, and it is divided in differen
 
 *Notes: The [Snappy Standalone Application](#) is being migrated from its old version written in Java. It is currently deprecated and no more available for downloading.
 
-# Components Architecture
-![Architecture](./architectureDesign.png)
+# Architecture Diagram
+![Architecture](architectureDiagram.png)
 
 # Database Model
 ![DiagramModel](./diagramModel.png)
@@ -29,7 +29,16 @@ We are still working in the solution, once it is finished, we will update this i
 
 
 ### Pre-requisites 📋
- * To be defined.
+ * Define an Environment variable called "SECRET_SNAPPY" with a String value, which will be used by the token generation algorithm.
+
+Example: 
+\
+SECRET_SNAPPY=G73rRnBODY5T9QMAX80hVvwN16HtKEIb
+
+*** Notes: you can use any key gen generator you like. Some examples are the following:
+* [KeyGen.io](https://keygen.io/)
+* [RandomKeyGen](https://randomkeygen.com/)
+
 ### How to Install 🔧
  * To be defined.
 

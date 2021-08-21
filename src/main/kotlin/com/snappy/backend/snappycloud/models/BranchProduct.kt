@@ -16,10 +16,10 @@ data class BranchProduct(
     var stockAvailable: Double,
     @Column(name = "stock_physical")
     var stockPhysical: Double,
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "branch_office_fk")
     val branchOffice: BranchOffice,
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "bp_product_fk")
     val product: Product
 )

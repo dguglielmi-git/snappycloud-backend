@@ -34,22 +34,22 @@ data class Product(
     var priceLastUpdate: Date,
     @Column(name = "product_last_update")
     var productLastUpdate: Date,
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "prod_sales_type_fk")
     var saleTypeDefault: SaleType,
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "prod_main_supplier_fk")
     var mainSupplier: Supplier,
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "prod_business_fk")
     val business: Business,
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "prod_category_fk")
     var category: Category,
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "prod_brand_fk")
     var brand: Brand,
-    @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
     @JoinColumn(name = "product_item_fk")
     val productItems: List<ProductItem> = mutableListOf<ProductItem>()
 )

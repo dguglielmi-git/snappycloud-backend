@@ -1,16 +1,11 @@
 package com.snappy.backend.snappycloud.controllers
 
-import com.auth0.jwt.JWT
-import com.auth0.jwt.JWTVerifier
-import com.auth0.jwt.algorithms.Algorithm
-import com.auth0.jwt.interfaces.DecodedJWT
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.snappy.backend.snappycloud.models.User
 import com.snappy.backend.snappycloud.services.UserService
 import com.snappy.backend.snappycloud.utils.TokenUtils
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
 import org.springframework.http.MediaType.*
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -18,7 +13,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import java.io.IOException
 import java.lang.RuntimeException
 import java.net.URI
-import java.util.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -47,7 +41,7 @@ class UserController(
             try {
                 tokenUtils.service = userService
                 val url: String = request.requestURL.toString()
-                val tokens = tokenUtils.getRefreshToken(authorizationHeader, url)
+                val tokens = tokenUtils.getRefreshTokens(authorizationHeader, url)
                 response.contentType = APPLICATION_JSON_VALUE
                 ObjectMapper().writeValue(response.outputStream, tokens)
             } catch (ex: Exception) {

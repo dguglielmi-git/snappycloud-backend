@@ -2,6 +2,7 @@ package com.snappy.backend.snappycloud.filters
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import com.auth0.jwt.interfaces.Claim
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.auth0.jwt.interfaces.JWTVerifier
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -33,12 +34,16 @@ class SnappyAuthorizationFilter : OncePerRequestFilter() {
                     val verifier: JWTVerifier = JWT.require(algorithm).build()
                     val decodedJWT: DecodedJWT = verifier.verify(token)
                     val username: String = decodedJWT.subject
+                    val param = request.getParameter("business")
+                    println(param) // param in call
+                    println(request.servletPath) // ex: /api/users
 
                     val profiles = decodedJWT.getClaim("profiles").asArray(String::class.java).toMutableList()
                     val authorities = mutableListOf<SimpleGrantedAuthority>()
                     profiles.forEach { profile -> authorities.add(SimpleGrantedAuthority(profile)) }
                     val authenticationToken: UsernamePasswordAuthenticationToken =
-                        UsernamePasswordAuthenticationToken(username, null, authorities)
+                        UsernamePasswordAuthenticationToken(username, null,null)
+                    println(authenticationToken)
                     SecurityContextHolder.getContext().authentication = authenticationToken
                     filterChain.doFilter(request, response)
                 } catch (ex: Exception) {

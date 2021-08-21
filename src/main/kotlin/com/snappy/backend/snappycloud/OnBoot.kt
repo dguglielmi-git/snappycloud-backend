@@ -16,7 +16,8 @@ class OnBoot(
     private val profileService: ProfileService,
 ) : ApplicationRunner {
     override fun run(args: ApplicationArguments?) {
-       /* profileService.save(Profile(0, "ROLE_ROOT"))
+/*
+        profileService.save(Profile(0, "ROLE_ROOT"))
         profileService.save(Profile(0, "ROLE_ADMIN"))
         profileService.save(Profile(0, "ROLE_MANAGER"))
         profileService.save(Profile(0, "ROLE_USER"))
@@ -33,9 +34,9 @@ class OnBoot(
             null,
             null
         ))
+*/
+       // profileService.addProfileToUser("dguglielmi","ROLE_ROOT")
 
-        profileService.addProfileToUser("dguglielmi","ROLE_ROOT")
 
-        */
     }
 }

@@ -14,7 +14,7 @@ data class User(
     @Column(name = "employee_code")
     var employeeCode: String? = null,
     @get:Size(max = 50)
-    @Column(name = "username", unique = true)
+    @Column(unique = true)
     val username: String,
     @JsonIgnore
     var password: String,
@@ -28,7 +28,6 @@ data class User(
     var dniSsnNino: String? = null,
     @ManyToMany(fetch = FetchType.EAGER)
     var profiles: MutableList<Profile>? = mutableListOf<Profile>(),
-    @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
-    @JoinColumn(name = "user_owner_business_fk")
-    var business: List<Business>? = mutableListOf<Business>()
+    @ManyToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    var business: MutableList<Business>? = mutableListOf<Business>()
 )

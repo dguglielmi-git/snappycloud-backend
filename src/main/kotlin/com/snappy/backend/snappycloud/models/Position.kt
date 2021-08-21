@@ -8,7 +8,7 @@ data class Position(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
     var description: String,
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "position_business_fk")
     val business: Business
 )
