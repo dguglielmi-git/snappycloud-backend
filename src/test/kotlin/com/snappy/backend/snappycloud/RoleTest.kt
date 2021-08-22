@@ -123,7 +123,7 @@ class RoleTest {
     }
 
     @Test
-    fun `Test - Check if User Does not exists`() {
+    fun `Test - Check if User Does not exist`() {
         UsersLogged.addUser("testing")
         UsersLogged.addUser("john")
 

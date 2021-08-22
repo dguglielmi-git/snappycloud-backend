@@ -10,7 +10,7 @@ data class CurrencyRate(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
     @Column(name ="rate_last_update")
-    var rateLastUpdate: Date,
+    var rateLastUpdate: Calendar,
     @Column(name = "rate_value")
     var rateValue: Double,
     @OneToOne(fetch = FetchType.LAZY)

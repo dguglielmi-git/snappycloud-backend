@@ -2,10 +2,10 @@ package com.snappy.backend.snappycloud.filters
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.auth0.jwt.interfaces.Claim
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.auth0.jwt.interfaces.JWTVerifier
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.snappy.backend.snappycloud.utils.UsersLogged
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -19,9 +19,9 @@ import javax.servlet.http.HttpServletResponse
 
 class SnappyAuthorizationFilter : OncePerRequestFilter() {
     override fun doFilterInternal(
-        request: HttpServletRequest,
-        response: HttpServletResponse,
-        filterChain: FilterChain,
+            request: HttpServletRequest,
+            response: HttpServletResponse,
+            filterChain: FilterChain,
     ) {
         if ((request.servletPath == "/api/login") || (request.servletPath == "/api/token/refresh")) {
             filterChain.doFilter(request, response)
@@ -34,29 +34,34 @@ class SnappyAuthorizationFilter : OncePerRequestFilter() {
                     val verifier: JWTVerifier = JWT.require(algorithm).build()
                     val decodedJWT: DecodedJWT = verifier.verify(token)
                     val username: String = decodedJWT.subject
-                    val param = request.getParameter("business")
-                    println(param) // param in call
-                    println(request.servletPath) // ex: /api/users
+                    val businessId = request.getParameter("business")
 
-                    val profiles = decodedJWT.getClaim("profiles").asArray(String::class.java).toMutableList()
+                    if (businessId == null) showError(response, "Business ID was not specified")
+
                     val authorities = mutableListOf<SimpleGrantedAuthority>()
-                    profiles.forEach { profile -> authorities.add(SimpleGrantedAuthority(profile)) }
-                    val authenticationToken: UsernamePasswordAuthenticationToken =
-                        UsernamePasswordAuthenticationToken(username, null,null)
+                    UsersLogged.getProfiles(username, businessId.toLong())?.forEach { profile ->
+                        authorities.add(SimpleGrantedAuthority(profile))
+                    }
+                    val authenticationToken =
+                            UsernamePasswordAuthenticationToken(username, null, authorities)
                     println(authenticationToken)
                     SecurityContextHolder.getContext().authentication = authenticationToken
                     filterChain.doFilter(request, response)
                 } catch (ex: Exception) {
-                    response.setHeader("error", ex.message)
-                    response.status = HttpStatus.FORBIDDEN.value()
-                    val error = mutableMapOf<String, String?>()
-                    error.put("error_message",ex.message)
-                    response.contentType = MediaType.APPLICATION_JSON_VALUE
-                    ObjectMapper().writeValue(response.outputStream,error)
+                    showError(response, ex.message ?: "Something went wrong.")
                 }
             } else {
                 filterChain.doFilter(request, response)
             }
         }
+    }
+
+    fun showError(response: HttpServletResponse, errorMsg: String) {
+        response.setHeader("error", errorMsg)
+        response.status = HttpStatus.FORBIDDEN.value()
+        val error = mutableMapOf<String, String?>()
+        error.put("error_message", errorMsg)
+        response.contentType = MediaType.APPLICATION_JSON_VALUE
+        ObjectMapper().writeValue(response.outputStream, error)
     }
 }

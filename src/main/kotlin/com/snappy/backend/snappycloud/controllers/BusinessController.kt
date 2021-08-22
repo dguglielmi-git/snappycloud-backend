@@ -13,9 +13,6 @@ class BusinessController(
     private val businessService: BusinessService
 ){
 
-    @GetMapping("/business/profiles/{id}")
-    fun listProfiles(@PathVariable id: Long): ResponseEntity<List<Profile>> =
-        ResponseEntity.ok().body(this.businessService.getProfiles(id))
 
     @PostMapping("/business/save")
     fun saveBusiness(@RequestBody business: Business): ResponseEntity<Business> =

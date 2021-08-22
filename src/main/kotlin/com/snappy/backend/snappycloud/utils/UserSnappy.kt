@@ -1,30 +1,35 @@
 package com.snappy.backend.snappycloud.utils
 
-import org.springframework.security.core.CredentialsContainer
-import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.userdetails.User
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Component
-import java.util.UUID
 
 @Component
-open class UserSnappy{
+class UserSnappy{
 
-    private val businessProfiles: MutableMap<Long, Array<String>> =
+    private val businessProfiles: MutableMap<Long, Set<String>> =
             mutableMapOf()
 
     fun addProfileToBusiness(businessId: Long, profile: String) {
         val profList = this.businessProfiles.get(businessId)
         if (profList == null) {
-            this.businessProfiles.put(businessId, arrayOf(profile))
+            this.businessProfiles.put(businessId, setOf(profile))
         } else {
             val temp: MutableList<String> = profList.toMutableList()
             temp.add(profile)
-            this.businessProfiles.put(businessId, temp.toTypedArray())
+            this.businessProfiles.put(businessId, temp.toSet())
         }
     }
 
-    fun getProfiles(businessId: Long): Array<String>? = this.businessProfiles.get(businessId)
+    fun removeProfileOfBusiness(businessId: Long, profile: String) {
+        val profList = this.businessProfiles.get(businessId)
+        val newList = profList?.filter { it != profile}
+        if (newList != null) {
+            this.businessProfiles.put(businessId,newList.toSet())
+        } else {
+            this.businessProfiles.remove(businessId)
+        }
+    }
+
+    fun getProfiles(businessId: Long): Array<String>? = this.businessProfiles.get(businessId)?.toTypedArray()
 
 
 

@@ -31,9 +31,9 @@ data class Product(
     @Column(name = "sale_price_retail")
     var salePriceRetail: Double,
     @Column(name = "price_last_update")
-    var priceLastUpdate: Date,
+    var priceLastUpdate: Calendar,
     @Column(name = "product_last_update")
-    var productLastUpdate: Date,
+    var productLastUpdate: Calendar,
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "prod_sales_type_fk")
     var saleTypeDefault: SaleType,

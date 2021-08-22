@@ -9,7 +9,7 @@ data class Remittance(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
     @Column(name ="issue_date")
-    val issueDate: Date,
+    val issueDate: Calendar,
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id")
     var client: Client,
@@ -18,5 +18,8 @@ data class Remittance(
     var branchOffice: BranchOffice,
     @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(name = "remittance_items_fk")
-    val remittanceItem: List<RemittanceItem> = mutableListOf<RemittanceItem>()
+    val remittanceItem: List<RemittanceItem> = mutableListOf<RemittanceItem>(),
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "remittance_business_fk")
+    val business: Business
 )

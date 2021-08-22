@@ -21,7 +21,7 @@ data class Material(
     @Column(name = "stock_available")
     var stockAvailable: Double,
     @Column(name = "last_update")
-    var lastUpdate: Date,
+    var lastUpdate: Calendar,
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "material_business_fk")
     val business: Business,

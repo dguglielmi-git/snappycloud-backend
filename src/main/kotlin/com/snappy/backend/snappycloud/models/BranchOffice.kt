@@ -17,7 +17,7 @@ data class BranchOffice(
     @Column(name = "internal_branch_code")
     var internalBranchCode: String?,
     @Column(name = "start_date")
-    val startDate: Date,
+    val startDate: Calendar,
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bo_country_fk")
     var country: Country?,

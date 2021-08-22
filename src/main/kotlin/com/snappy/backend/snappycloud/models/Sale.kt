@@ -10,7 +10,7 @@ data class Sale(
     val id: Long,
     val subtotal: Double,
     @Column(name = "issue_date")
-    val issueDate: Date,
+    val issueDate: Calendar,
     @Column(name = "subtotal_taxes")
     val subtotalTaxes: Double,
     @Column(name = "total_sale")
@@ -35,5 +35,8 @@ data class Sale(
     val saleTax: List<SaleTax> = mutableListOf<SaleTax>(),
     @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(name = "sale_sale_item_fk")
-    val saleItem: List<SaleItem> = mutableListOf<SaleItem>()
+    val saleItem: List<SaleItem> = mutableListOf<SaleItem>(),
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sale_business_fk")
+    val business: Business
 )

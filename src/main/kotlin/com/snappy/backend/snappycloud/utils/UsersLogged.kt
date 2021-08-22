@@ -1,6 +1,14 @@
 package com.snappy.backend.snappycloud.utils
 
+import org.springframework.stereotype.Component
+
+@Component
 object UsersLogged {
+
+    init {
+        println("UsersLogged initialized")
+    }
+
     private val users: MutableMap<String, UserSnappy> = mutableMapOf()
 
     private fun getUser(user: String): UserSnappy? = users.get(user)
@@ -32,6 +40,17 @@ object UsersLogged {
         if (user != null) {
             user.addProfileToBusiness(businessId, profile)
             users.put(username, user)
+        } else {
+            val newUser = UserSnappy()
+            newUser.addProfileToBusiness(businessId, profile)
+            users.put(username, newUser)
+        }
+    }
+
+    fun removeProfile(username: String, profile: String, businessId: Long) {
+        val user = getUser(username)
+        if (user !=null) {
+            user.removeProfileOfBusiness(businessId,profile)
         }
     }
 

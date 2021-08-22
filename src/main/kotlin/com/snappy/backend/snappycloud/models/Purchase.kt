@@ -14,7 +14,7 @@ data class Purchase(
     @Column(name = "last_cost")
     val lastCost: Double,
     @Column(name = "purchase_date")
-    val purchaseDate: Date,
+    val purchaseDate: Calendar,
     @Column(name = "last_stock")
     val lastStock: Double,
     @OneToOne(fetch = FetchType.LAZY)

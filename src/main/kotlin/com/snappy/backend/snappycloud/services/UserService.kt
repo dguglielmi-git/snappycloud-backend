@@ -2,7 +2,10 @@ package com.snappy.backend.snappycloud.services
 
 import com.snappy.backend.snappycloud.models.User
 import com.snappy.backend.snappycloud.repositories.UserRepository
+import com.snappy.backend.snappycloud.utils.UsersLogged
+import javassist.Loader
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -10,25 +13,33 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import java.util.*
+import java.util.stream.Collectors
 import javax.persistence.EntityNotFoundException
 import javax.transaction.Transactional
 
 @Service
 @Transactional
 class UserService(
-    private val userRepository: UserRepository,
+        private val userRepository: UserRepository,
+        private val businessService: BusinessService,
 ) : UserDetailsService, GenericService<User, Long> {
     private val passwordEncoder: PasswordEncoder = BCryptPasswordEncoder()
 
     override fun save(user: User): User {
         user.password = passwordEncoder.encode(user.password)
+        val year = Calendar.YEAR
+        val month = Calendar.MONTH
+        val day = Calendar.DAY_OF_MONTH
+        user.issueDate = GregorianCalendar(year, month, day)
+        user.active = 1
         return this.userRepository.save(user)
     }
 
     fun getById(id: Long): User? = this.userRepository.getById(id)
 
     fun findByUsername(username: String): User? =
-        this.userRepository.findByUsername(username)
+            this.userRepository.findByUsername(username)
 
     override fun findAll(): List<User> = this.userRepository.findAll()
 
@@ -48,11 +59,10 @@ class UserService(
 
     @Throws(UsernameNotFoundException::class)
     override fun loadUserByUsername(username: String): UserDetails {
-        val user: User? = userRepository.findByUsername(username)
-        val authorities = mutableListOf<SimpleGrantedAuthority>()
-
+        val user = userRepository.findByUsername("dguglielmi")
         if (user != null) {
-            user.profiles?.forEach { profile -> authorities.add(SimpleGrantedAuthority(profile.name)) }
+            val authorities = mutableListOf<SimpleGrantedAuthority>()
+            authorities.add(SimpleGrantedAuthority("ROLE"))
             return org.springframework.security.core.userdetails.User(user.username, user.password, authorities)
         } else throw UsernameNotFoundException("User not found in the database")
     }

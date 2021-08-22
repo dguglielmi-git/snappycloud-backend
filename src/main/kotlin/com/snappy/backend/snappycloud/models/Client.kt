@@ -27,15 +27,15 @@ data class Client(
     @Column(name = "cuit_nino_ssn_corp")
     var cuitNinoSsnCorp: String? = "",
     @Column(name = "issue_date_system")
-    val issueDateSystem: Date,
+    val issueDateSystem: Calendar,
     @Column(name = "last_update")
-    var lastUpdate: Date,
+    var lastUpdate: Calendar,
     @Column(name = "num_iibb")
     var iibb: String? = "",
     @Column(name = "company_name")
     var companyName: String? = "",
     @Column(name = "balance_last_update")
-    var balanceLastUpdate: Date,
+    var balanceLastUpdate: Calendar,
     @Column(name = "balance_debit")
     var balanceDebit: Double,
     @Column(name = "balance_credit")

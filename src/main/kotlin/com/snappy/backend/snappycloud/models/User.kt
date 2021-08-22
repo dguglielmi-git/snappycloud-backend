@@ -9,7 +9,7 @@ import javax.validation.constraints.Size
 @Entity
 data class User(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     val id: Long = 0,
     @Column(name = "employee_code")
     var employeeCode: String? = null,
@@ -23,11 +23,7 @@ data class User(
     var email: String,
     var active: Int,
     @Column(name = "issue_date")
-    val issueDate: Calendar,
+    var issueDate: Calendar,
     @Column(name = "dni_ssn_nino")
-    var dniSsnNino: String? = null,
-    @ManyToMany(fetch = FetchType.EAGER)
-    var profiles: MutableList<Profile>? = mutableListOf<Profile>(),
-    @ManyToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
-    var business: MutableList<Business>? = mutableListOf<Business>()
+    var dniSsnNino: String? = null
 )

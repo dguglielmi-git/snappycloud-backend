@@ -17,5 +17,5 @@ data class Profile(
     @GeneratedValue(strategy = GenerationType.AUTO)
     val id: Long = 0,
     @Column(name = "profile_name")
-    var name: String
+    val name: String
 )
