@@ -35,7 +35,7 @@ Example:
 \
 SECRET_SNAPPY=G73rRnBODY5T9QMAX80hVvwN16HtKEIb
 
-*** Notes: you can use any key gen generator you like. Some examples are the following:
+*** Notes: you can use any key generator you like. Some examples are the following:
 * [KeyGen.io](https://keygen.io/)
 * [RandomKeyGen](https://randomkeygen.com/)
 
@@ -50,13 +50,12 @@ SECRET_SNAPPY=G73rRnBODY5T9QMAX80hVvwN16HtKEIb
 
 
 * [<b>Spring Data JPA</b>](https://spring.io/projects/spring-data-jpa) - Persist data in SQL stores with Java Persistence API using Spring Data and Hibernate.
-* [<b>MySQL Driver</b>](https://spring.io/guides/gs/accessing-data-mysql/) - MySQL JDBC and R2DBC driver.
 * [<b>Spring WEB</b>](https://spring.io/guides/gs/spring-boot/) - Build web, including RESTful, applications using Spring MVC. Uses Apache Tomcat as the default
   embedded container.
 * [<b>Spring Security</b>](https://spring.io/projects/spring-security) - Highly customizable authentication and access-control framework for Spring applications.
 * [<b>Spring Boot DevTools</b>](https://docs.spring.io/spring-boot/docs/current/reference/html/using.html) - Provides fast application restarts, LiveReload, and configurations for enhanced
   development experience.
-* [<b>Lombok</b>](https://projectlombok.org/) - Java annotation library which helps to reduce boilerplate code.
+* [<b>MySQL Driver</b>](https://spring.io/guides/gs/accessing-data-mysql/) - MySQL JDBC and R2DBC driver.
 * [<b>auth0-Java-jwt</b>](https://mvnrepository.com/artifact/com.auth0/java-jwt/3.18.1) - Java implementation of JSON Web Token (JWT)
 * [<b>Swagger</b>](https://mvnrepository.com/artifact/io.springfox/springfox-swagger2) - Simplify API development for users, teams, and enterprises with the Swagger open source and professional toolset.
 
