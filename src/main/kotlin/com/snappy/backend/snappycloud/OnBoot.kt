@@ -68,13 +68,13 @@ class OnBoot(
             res -> println("${res.user.username} - ${res.profile.name}")
         }
         */
-
+/*
         val user = userService.findByUsername("dguglielmi")
         val result: Array<UserBusinessRole>? = userBusinessRoleService.findByUser(user!!.id)
 
         result?.forEach { res ->
             println("${res.business.id}- ${res.profile.name}")
         }
-
+*/
     }
 }

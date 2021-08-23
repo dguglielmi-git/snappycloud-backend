@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletResponse
 @RestController
 @RequestMapping("/api")
 class UserController(
-    private val userService: UserService,
+        private val userService: UserService,
 ) {
     val tokenUtils = TokenUtils()
 
@@ -29,7 +29,7 @@ class UserController(
     @PostMapping("/user/save")
     fun saveUser(@RequestBody user: User): ResponseEntity<User> {
         val uri: URI =
-            URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString())
+                URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString())
         return ResponseEntity.created(uri).body(userService.save(user))
     }
 
@@ -42,19 +42,22 @@ class UserController(
                 tokenUtils.service = userService
                 val url: String = request.requestURL.toString()
                 val tokens = tokenUtils.getRefreshTokens(authorizationHeader, url)
-                response.contentType = APPLICATION_JSON_VALUE
-                ObjectMapper().writeValue(response.outputStream, tokens)
+                sendResponse(response, tokens)
             } catch (ex: Exception) {
                 response.setHeader("error", ex.message)
                 response.status = HttpStatus.FORBIDDEN.value()
-                val error = mutableMapOf<String, String?>()
-                error.put("error_message", ex.message)
-                response.contentType = APPLICATION_JSON_VALUE
-                ObjectMapper().writeValue(response.outputStream, error)
+                val error = mutableMapOf<String, String>()
+                error.put("error_message", ex.message ?: "Error getting refresh token.")
+                sendResponse(response, error)
             }
         } else {
             throw RuntimeException("Refresh token is missing")
         }
+    }
+
+    private fun sendResponse(response: HttpServletResponse, map: MutableMap<String, String>) {
+        response.contentType = APPLICATION_JSON_VALUE
+        ObjectMapper().writeValue(response.outputStream, map)
     }
 
 

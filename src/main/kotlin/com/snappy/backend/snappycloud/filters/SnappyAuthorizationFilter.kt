@@ -1,10 +1,7 @@
 package com.snappy.backend.snappycloud.filters
 
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
-import com.auth0.jwt.interfaces.DecodedJWT
-import com.auth0.jwt.interfaces.JWTVerifier
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.snappy.backend.snappycloud.utils.TokenUtils
 import com.snappy.backend.snappycloud.utils.UsersLogged
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -17,7 +14,11 @@ import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-class SnappyAuthorizationFilter : OncePerRequestFilter() {
+class SnappyAuthorizationFilter() : OncePerRequestFilter() {
+
+    private lateinit var request: HttpServletRequest
+    private lateinit var response: HttpServletResponse
+
     override fun doFilterInternal(
             request: HttpServletRequest,
             response: HttpServletResponse,
@@ -28,27 +29,20 @@ class SnappyAuthorizationFilter : OncePerRequestFilter() {
         } else {
             val authorizationHeader: String? = request.getHeader(HttpHeaders.AUTHORIZATION)
             if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+                this.response = response
+                this.request = request
                 try {
-                    val token: String = authorizationHeader.substring("Bearer ".length)
-                    val algorithm: Algorithm = Algorithm.HMAC256(System.getenv("SECRET_SNAPPY").toByteArray())
-                    val verifier: JWTVerifier = JWT.require(algorithm).build()
-                    val decodedJWT: DecodedJWT = verifier.verify(token)
-                    val username: String = decodedJWT.subject
+                    val tokenUtils = TokenUtils()
+                    val username = tokenUtils.getUserFromToken(authorizationHeader)
                     val businessId = request.getParameter("business")
-
-                    if (businessId == null) showError(response, "Business ID was not specified")
-
-                    val authorities = mutableListOf<SimpleGrantedAuthority>()
-                    UsersLogged.getProfiles(username, businessId.toLong())?.forEach { profile ->
-                        authorities.add(SimpleGrantedAuthority(profile))
-                    }
+                    if (businessId == null) showError("Business ID was not specified")
+                    val authorities = getAuthorities(username, businessId)
                     val authenticationToken =
                             UsernamePasswordAuthenticationToken(username, null, authorities)
-                    println(authenticationToken)
                     SecurityContextHolder.getContext().authentication = authenticationToken
                     filterChain.doFilter(request, response)
                 } catch (ex: Exception) {
-                    showError(response, ex.message ?: "Something went wrong.")
+                    showError(ex.message ?: "Something went wrong.")
                 }
             } else {
                 filterChain.doFilter(request, response)
@@ -56,12 +50,15 @@ class SnappyAuthorizationFilter : OncePerRequestFilter() {
         }
     }
 
-    fun showError(response: HttpServletResponse, errorMsg: String) {
-        response.setHeader("error", errorMsg)
-        response.status = HttpStatus.FORBIDDEN.value()
+    private fun getAuthorities(username: String, businessId: String) : MutableList<SimpleGrantedAuthority> =
+            UsersLogged.getProfilesAuthorities(username,businessId.toLong())
+
+    private fun showError(errorMsg: String) {
+        this.response.setHeader("error", errorMsg)
+        this.response.status = HttpStatus.FORBIDDEN.value()
         val error = mutableMapOf<String, String?>()
         error.put("error_message", errorMsg)
-        response.contentType = MediaType.APPLICATION_JSON_VALUE
-        ObjectMapper().writeValue(response.outputStream, error)
+        this.response.contentType = MediaType.APPLICATION_JSON_VALUE
+        ObjectMapper().writeValue(this.response.outputStream, error)
     }
 }

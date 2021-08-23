@@ -1,5 +1,6 @@
 package com.snappy.backend.snappycloud.utils
 
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.stereotype.Component
 
 @Component
@@ -37,6 +38,7 @@ object UsersLogged {
 
     fun addProfile(username: String, profile: String, businessId: Long) {
         val user = getUser(username)
+
         if (user != null) {
             user.addProfileToBusiness(businessId, profile)
             users.put(username, user)
@@ -49,8 +51,8 @@ object UsersLogged {
 
     fun removeProfile(username: String, profile: String, businessId: Long) {
         val user = getUser(username)
-        if (user !=null) {
-            user.removeProfileOfBusiness(businessId,profile)
+        if (user != null) {
+            user.removeProfileOfBusiness(businessId, profile)
         }
     }
 
@@ -62,4 +64,15 @@ object UsersLogged {
         return if (user != null) user.getProfiles(businessId)?.sortedArray() else null
     }
 
+    fun getProfilesAuthorities(username: String, businessId: Long): MutableList<SimpleGrantedAuthority> {
+        val user = this.getUser(username)
+        val authorities = mutableListOf<SimpleGrantedAuthority>()
+
+        if (user != null) {
+            user.getProfiles(businessId)?.forEach { profile ->
+                authorities.add(SimpleGrantedAuthority(profile))
+            }
+        }
+        return authorities
+    }
 }

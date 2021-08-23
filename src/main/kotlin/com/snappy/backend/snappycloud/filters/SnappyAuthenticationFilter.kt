@@ -36,8 +36,9 @@ class SnappyAuthenticationFilter(
     ) {
         val url: String = request.requestURL.toString()
         tokenUtils.service = userService
+        tokenUtils.authentication = authentication
         tokenUtils.userBusinessRoleService = userBusinessRoleService
-        val tokens: MutableMap<String, String> = tokenUtils.getTokens(authentication, url)
+        val tokens: MutableMap<String, String> = tokenUtils.getTokens(url)
         response.contentType = MediaType.APPLICATION_JSON_VALUE
         ObjectMapper().writeValue(response.outputStream, tokens)
     }
