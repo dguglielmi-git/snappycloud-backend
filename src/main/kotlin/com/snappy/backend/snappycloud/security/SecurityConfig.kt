@@ -1,15 +1,13 @@
 package com.snappy.backend.snappycloud.security
 
+import com.snappy.backend.snappycloud.auth.TokenSnappy
+import com.snappy.backend.snappycloud.auth.filters.SnappyAuthenticationFilter
+import com.snappy.backend.snappycloud.auth.filters.SnappyAuthorizationFilter
 import com.snappy.backend.snappycloud.constants.SnappyConst
-import com.snappy.backend.snappycloud.filters.SnappyAuthenticationFilter
-import com.snappy.backend.snappycloud.filters.SnappyAuthorizationFilter
-import com.snappy.backend.snappycloud.services.BusinessService
-import com.snappy.backend.snappycloud.services.UserBusinessRoleService
-import com.snappy.backend.snappycloud.services.UserService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.HttpMethod
-import org.springframework.http.HttpMethod.*
+import org.springframework.http.HttpMethod.GET
+import org.springframework.http.HttpMethod.POST
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -24,8 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 class SecurityConfig(
         val userDetailsService: UserDetailsService,
-        val userService: UserService,
-        val userBusinessRoleService: UserBusinessRoleService
+        val tokenUtils: TokenSnappy,
 ) : WebSecurityConfigurerAdapter() {
 
     private val bCryptPasswordEncoder: BCryptPasswordEncoder = BCryptPasswordEncoder()
@@ -40,8 +37,7 @@ class SecurityConfig(
         val snappyAuthenticationFilter =
                 SnappyAuthenticationFilter(
                         authenticationManagerBean(),
-                        userService,
-                        userBusinessRoleService
+                        tokenUtils
                 )
         snappyAuthenticationFilter.setFilterProcessesUrl("/api/login")
         http.csrf().disable()
@@ -86,7 +82,7 @@ class SecurityConfig(
 
         http.authorizeRequests().anyRequest().authenticated()
         http.addFilter(snappyAuthenticationFilter)
-        http.addFilterBefore(SnappyAuthorizationFilter(),
+        http.addFilterBefore(SnappyAuthorizationFilter(tokenUtils),
                 UsernamePasswordAuthenticationFilter::class.java)
     }
 

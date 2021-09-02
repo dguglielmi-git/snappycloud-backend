@@ -1,11 +1,9 @@
 package com.snappy.backend.snappycloud.services
 
+import com.snappy.backend.snappycloud.dtos.UserDTO
 import com.snappy.backend.snappycloud.models.User
 import com.snappy.backend.snappycloud.repositories.UserRepository
-import com.snappy.backend.snappycloud.utils.UsersLogged
-import javassist.Loader
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -14,7 +12,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.util.*
-import java.util.stream.Collectors
 import javax.persistence.EntityNotFoundException
 import javax.transaction.Transactional
 
@@ -22,8 +19,7 @@ import javax.transaction.Transactional
 @Transactional
 class UserService(
         private val userRepository: UserRepository,
-        private val businessService: BusinessService,
-) : UserDetailsService, GenericService<User, Long> {
+) : UserDetailsService, IGenericService<User, Long> {
     private val passwordEncoder: PasswordEncoder = BCryptPasswordEncoder()
 
     override fun save(user: User): User {
@@ -38,10 +34,25 @@ class UserService(
 
     fun getById(id: Long): User? = this.userRepository.getById(id)
 
-    fun findByUsername(username: String): User? =
-            this.userRepository.findByUsername(username)
+    fun findByUsername(username: String): User? = this.userRepository.findByUsername(username)
 
-    override fun findAll(): List<User> = this.userRepository.findAll()
+    override fun findAll(): List<UserDTO> {
+        val users: MutableList<UserDTO> = mutableListOf()
+        userRepository.findAll().forEach { user ->
+            users.add(UserDTO(
+                    user.id,
+                    user.employeeCode,
+                    user.username,
+                    user.name,
+                    user.surname,
+                    user.email,
+                    user.active,
+                    user.issueDateString,
+                    user.dniSsnNino
+            ))
+        }
+        return users.toList()
+    }
 
     override fun findById(id: Long): User? = this.userRepository.findByIdOrNull(id)
 

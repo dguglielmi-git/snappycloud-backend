@@ -1,7 +1,6 @@
 package com.snappy.backend.snappycloud.services
 
 import com.snappy.backend.snappycloud.models.Profile
-import com.snappy.backend.snappycloud.models.User
 import com.snappy.backend.snappycloud.repositories.ProfileRepository
 import com.snappy.backend.snappycloud.repositories.UserRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -14,7 +13,7 @@ import javax.transaction.Transactional
 class ProfileService(
     private val userRepository: UserRepository,
     private val profileRepository: ProfileRepository,
-) : GenericService<Profile, Long> {
+) : IGenericService<Profile, Long> {
     override fun findAll(): List<Profile> = this.profileRepository.findAll()
 
     override fun findById(id: Long): Profile? = this.profileRepository.findByIdOrNull(id)

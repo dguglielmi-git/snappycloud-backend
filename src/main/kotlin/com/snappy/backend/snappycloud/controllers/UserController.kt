@@ -1,17 +1,18 @@
 package com.snappy.backend.snappycloud.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.snappy.backend.snappycloud.auth.TokenSnappy
+import com.snappy.backend.snappycloud.dtos.TokenDTO
+import com.snappy.backend.snappycloud.dtos.UserDTO
 import com.snappy.backend.snappycloud.models.User
 import com.snappy.backend.snappycloud.services.UserService
-import com.snappy.backend.snappycloud.utils.TokenUtils
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType.*
+import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import java.io.IOException
-import java.lang.RuntimeException
 import java.net.URI
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -20,11 +21,11 @@ import javax.servlet.http.HttpServletResponse
 @RequestMapping("/api")
 class UserController(
         private val userService: UserService,
+        private val tokenUtils: TokenSnappy,
 ) {
-    val tokenUtils = TokenUtils()
 
     @GetMapping("/users")
-    fun getUsers(): ResponseEntity<List<User>> = ResponseEntity.ok().body(userService.findAll())
+    fun getUsers(): ResponseEntity<List<UserDTO>> = ResponseEntity.ok().body(userService.findAll())
 
     @PostMapping("/user/save")
     fun saveUser(@RequestBody user: User): ResponseEntity<User> {
@@ -39,26 +40,30 @@ class UserController(
         val authorizationHeader: String? = request.getHeader(AUTHORIZATION)
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             try {
-                tokenUtils.service = userService
                 val url: String = request.requestURL.toString()
                 val tokens = tokenUtils.getRefreshTokens(authorizationHeader, url)
-                sendResponse(response, tokens)
+                val tokensResponse = TokenDTO(
+                        tokens.get("access_token") ?: "not access token found",
+                        tokens.get("refresh_token") ?: "not refresh token found")
+                sendResponse(response, tokensResponse)
             } catch (ex: Exception) {
-                response.setHeader("error", ex.message)
-                response.status = HttpStatus.FORBIDDEN.value()
-                val error = mutableMapOf<String, String>()
-                error.put("error_message", ex.message ?: "Error getting refresh token.")
-                sendResponse(response, error)
+                sendErrorMessage(response, ex.message)
             }
         } else {
             throw RuntimeException("Refresh token is missing")
         }
     }
 
-    private fun sendResponse(response: HttpServletResponse, map: MutableMap<String, String>) {
+    private fun sendResponse(response: HttpServletResponse, valueResponse: Any) {
         response.contentType = APPLICATION_JSON_VALUE
-        ObjectMapper().writeValue(response.outputStream, map)
+        ObjectMapper().writeValue(response.outputStream, valueResponse)
     }
 
-
+    private fun sendErrorMessage(response: HttpServletResponse, errorMessage: String?) {
+        response.setHeader("error", errorMessage)
+        response.status = HttpStatus.FORBIDDEN.value()
+        val error = mutableMapOf<String, String>()
+        error.put("error_message", errorMessage ?: "Error getting refresh token.")
+        sendResponse(response, error)
+    }
 }

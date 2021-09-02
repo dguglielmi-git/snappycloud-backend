@@ -11,7 +11,7 @@ import javax.transaction.Transactional
 @Transactional
 class BusinessService(
         private val businessRepository: BusinessRepository,
-) : GenericService<Business, Long> {
+) : IGenericService<Business, Long> {
 
     override fun findAll(): List<Business> = this.businessRepository.findAll()
 

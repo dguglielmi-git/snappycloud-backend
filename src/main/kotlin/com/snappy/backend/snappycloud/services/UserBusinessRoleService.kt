@@ -12,7 +12,7 @@ import javax.transaction.Transactional
 @Transactional
 class UserBusinessRoleService(
         private val userBusinessRoleRepository: UserBusinessRoleRepository
-) : GenericService<UserBusinessRole, UserBusinessRoleId> {
+) : IGenericService<UserBusinessRole, UserBusinessRoleId> {
     override fun findAll(): List<UserBusinessRole> = this.userBusinessRoleRepository.findAll()
 
     override fun findById(id: UserBusinessRoleId): UserBusinessRole? =

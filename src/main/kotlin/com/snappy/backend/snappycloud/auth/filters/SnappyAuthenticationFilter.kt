@@ -1,10 +1,6 @@
-package com.snappy.backend.snappycloud.filters
+package com.snappy.backend.snappycloud.auth.filters
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.snappy.backend.snappycloud.services.UserBusinessRoleService
-import com.snappy.backend.snappycloud.services.UserService
-import com.snappy.backend.snappycloud.utils.TokenUtils
-import org.springframework.http.MediaType
+import com.snappy.backend.snappycloud.auth.TokenSnappy
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -16,10 +12,8 @@ import javax.servlet.http.HttpServletResponse
 
 class SnappyAuthenticationFilter(
         authenticationManager: AuthenticationManager,
-        private val userService: UserService,
-        private val userBusinessRoleService: UserBusinessRoleService,
+        private val tokenUtils: TokenSnappy,
 ) : UsernamePasswordAuthenticationFilter(authenticationManager) {
-    private val tokenUtils = TokenUtils()
 
     override fun attemptAuthentication(request: HttpServletRequest, response: HttpServletResponse?): Authentication {
         val username: String = request.getParameter("username")
@@ -35,11 +29,6 @@ class SnappyAuthenticationFilter(
             authentication: Authentication,
     ) {
         val url: String = request.requestURL.toString()
-        tokenUtils.service = userService
-        tokenUtils.authentication = authentication
-        tokenUtils.userBusinessRoleService = userBusinessRoleService
-        val tokens: MutableMap<String, String> = tokenUtils.getTokens(url)
-        response.contentType = MediaType.APPLICATION_JSON_VALUE
-        ObjectMapper().writeValue(response.outputStream, tokens)
+        tokenUtils.sendTokens(url, response, authentication)
     }
 }
