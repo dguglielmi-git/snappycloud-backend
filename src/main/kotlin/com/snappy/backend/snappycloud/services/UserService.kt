@@ -3,7 +3,6 @@ package com.snappy.backend.snappycloud.services
 import com.snappy.backend.snappycloud.dtos.UserDTO
 import com.snappy.backend.snappycloud.models.User
 import com.snappy.backend.snappycloud.repositories.UserRepository
-import javassist.bytecode.ExceptionTable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
