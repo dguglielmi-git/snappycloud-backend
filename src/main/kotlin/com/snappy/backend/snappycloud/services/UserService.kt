@@ -68,15 +68,15 @@ class UserService(
 
     @Throws(UsernameNotFoundException::class)
     override fun loadUserByUsername(username: String): UserDetails {
-        val user = userRepository.findByUsernameAndActive(username, 1)
-        if (user != null) {
+        userRepository.findByUsernameAndActive(username, 1)?.let {
             val authorities = mutableListOf<SimpleGrantedAuthority>()
             authorities.add(SimpleGrantedAuthority("ROLE"))
             return org.springframework.security.core.userdetails.User(
-                    user.username,
-                    user.password,
+                    it.username,
+                    it.password,
                     authorities)
-        } else throw UsernameNotFoundException("User not found in the database")
+        }
+        throw UsernameNotFoundException("User not found in the database")
     }
 
     fun updateUserPassword(user: String, pass: String) {
