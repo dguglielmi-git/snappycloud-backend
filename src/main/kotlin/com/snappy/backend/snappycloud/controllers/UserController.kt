@@ -54,9 +54,6 @@ class UserController(
             val userParser = modelMapper.map(user, User::class.java)
             userParser.issueDate = common.dateStringToCalendar(user.issueDateString!!)
 
-            val uri: URI =
-                    URI.create(ServletUriComponentsBuilder.fromCurrentContextPath()
-                            .path("/api/user/update").toUriString())
             ResponseEntity.ok().body(userService.update(userParser))
         } catch (ex: Exception) {
             tokenUtils.sendErrorResponse(response, "Error $ex")
@@ -67,18 +64,14 @@ class UserController(
     @PutMapping("/user/update/password")
     fun updatePassword(response: HttpServletResponse, request: HttpServletRequest):
             ResponseEntity<MessageDTO> {
-        val authorizationHeader: String? = request.getHeader(HttpHeaders.AUTHORIZATION)
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            try {
-                val username = tokenUtils.getUserFromToken(authorizationHeader)
-                val password = request.getParameter("password")
-                userService.updateUserPassword(username, password)
-                return ResponseEntity.ok().body(MessageDTO("User Updated."))
-            } catch (ex: Exception) {
-                return ResponseEntity.notFound().build()
-            }
+        try {
+            val username = tokenUtils.getUserFromToken(getBearer(request))
+            val password = getParameterFromHeader(request, "password")
+            userService.updateUserPassword(username, password)
+            return ResponseEntity.ok().body(MessageDTO("User password updated."))
+        } catch (ex: Exception) {
+            return ResponseEntity.notFound().build()
         }
-        return ResponseEntity.badRequest().build()
     }
 
     @DeleteMapping("/user/delete")
@@ -87,23 +80,20 @@ class UserController(
         val authorizationHeader: String? = request.getHeader(HttpHeaders.AUTHORIZATION)
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             try {
-                val userOnToken = tokenUtils.getUserFromToken(authorizationHeader)
-                val userToDelete = request.getParameter("username")
+                val userOnToken = tokenUtils.getUserFromToken(getBearer(request))
+                val userToDelete = getParameterFromHeader(request, "username")
 
                 if (userOnToken == userToDelete) {
-                    val user = userService.findByUsername(userToDelete)
-                    if (user != null) {
-                        user.active = 0
-                        userService.update(user)
-                        return ResponseEntity.ok().body(MessageDTO(
-                                "User ${user.username} has been disabled."))
-                    } else {
-                        return ResponseEntity.notFound().build()
+                    userService.findByUsername(userToDelete)?.let {
+                        it.active = 0
+                        userService.update(it)
+                        return ResponseEntity.ok().body(MessageDTO("User has been disabled."))
                     }
                 } else {
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
                 }
             } catch (ex: Exception) {
+                println(ex)
                 return ResponseEntity.badRequest().build()
             }
         }
@@ -124,5 +114,15 @@ class UserController(
         } else {
             throw RuntimeException("Refresh token is missing")
         }
+    }
+
+    private fun getParameterFromHeader(request: HttpServletRequest, param: String) =
+            request.getParameter(param)
+
+    private fun getBearer(request: HttpServletRequest): String {
+        val authorizationHeader: String? = request.getHeader(HttpHeaders.AUTHORIZATION)
+        return if (authorizationHeader != null && authorizationHeader.startsWith("Bearer "))
+            authorizationHeader
+        else ""
     }
 }

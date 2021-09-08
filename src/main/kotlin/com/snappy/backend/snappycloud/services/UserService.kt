@@ -3,6 +3,7 @@ package com.snappy.backend.snappycloud.services
 import com.snappy.backend.snappycloud.dtos.UserDTO
 import com.snappy.backend.snappycloud.models.User
 import com.snappy.backend.snappycloud.repositories.UserRepository
+import javassist.bytecode.ExceptionTable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
@@ -35,7 +36,7 @@ class UserService(
     fun getById(id: Long): UserDTO? = parseUserToDTO(this.userRepository.getById(id))
 
     fun findByUsername(username: String): User? =
-            this.userRepository.findByUsernameAndActive(username,1)
+            this.userRepository.findByUsernameAndActive(username, 1)
 
     override fun findAll(): List<UserDTO> {
         val users: MutableList<UserDTO> = mutableListOf()
@@ -48,12 +49,14 @@ class UserService(
     override fun findById(id: Long): User? = this.userRepository.findByIdOrNull(id)
 
     override fun update(t: User): UserDTO {
-        val user = this.userRepository.findByUsernameAndActive(t.username,1)
-        if (user != null) {
-            t.password = user.password
-            return parseUserToDTO(this.userRepository.save(t))
-        } else {
-            throw  Exception("${t.id} does not exist")
+        try {
+            this.findById(t.id).also {
+                t.password = it?.password
+            }.apply {
+                return parseUserToDTO(this@UserService.userRepository.save(t))
+            }
+        } catch (ex: Exception) {
+            throw Exception("${t.id} does not exist")
         }
     }
 
@@ -65,7 +68,7 @@ class UserService(
 
     @Throws(UsernameNotFoundException::class)
     override fun loadUserByUsername(username: String): UserDetails {
-        val user = userRepository.findByUsernameAndActive(username,1)
+        val user = userRepository.findByUsernameAndActive(username, 1)
         if (user != null) {
             val authorities = mutableListOf<SimpleGrantedAuthority>()
             authorities.add(SimpleGrantedAuthority("ROLE"))
@@ -78,10 +81,9 @@ class UserService(
 
     fun updateUserPassword(user: String, pass: String) {
         try {
-            val user = this.userRepository.findByUsernameAndActive(user,1)
-            if (user != null) {
-                user.password = encode(pass)
-                this.update(user)
+            this.userRepository.findByUsernameAndActive(user, 1)?.let {
+                it.password = encode(pass)
+                this@UserService.userRepository.save(it)
             }
         } catch (ex: Exception) {
             throw Exception("User not found")
