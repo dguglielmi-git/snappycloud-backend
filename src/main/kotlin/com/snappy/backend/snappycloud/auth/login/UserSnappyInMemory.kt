@@ -9,21 +9,21 @@ class UserSnappyInMemory : IGenericUserLogged {
             mutableMapOf()
 
     override fun addProfileToBusiness(businessId: Long, profile: String) {
-        val profList = this.businessProfiles.get(businessId)
+        val profList = this.businessProfiles[businessId]
         if (profList == null) {
-            this.businessProfiles.put(businessId, setOf(profile))
+            this.businessProfiles[businessId] = setOf(profile)
         } else {
             val temp: MutableList<String> = profList.toMutableList()
             temp.add(profile)
-            this.businessProfiles.put(businessId, temp.toSet())
+            this.businessProfiles[businessId] = temp.toSet()
         }
     }
 
-    override fun removeProfileOfBusiness(businessId: Long, profile: String) {
-        val profList = this.businessProfiles.get(businessId)
+    override fun removeProfileFromBusiness(businessId: Long, profile: String) {
+        val profList = this.businessProfiles[businessId]
         val newList = profList?.filter { it != profile }
         if (newList != null) {
-            this.businessProfiles.put(businessId, newList.toSet())
+            this.businessProfiles[businessId] = newList.toSet()
         } else {
             this.businessProfiles.remove(businessId)
         }
@@ -34,5 +34,4 @@ class UserSnappyInMemory : IGenericUserLogged {
     override fun resetProfiles(businessId: Long) {
         this.businessProfiles.remove(businessId)
     }
-
 }

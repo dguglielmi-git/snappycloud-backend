@@ -24,7 +24,7 @@ class TokenSnappy(
         private val service: UserService,
         private val userBusinessRoleService: UserBusinessRoleService,
 ) {
-    private val timeoutToken = 10 * 60 * 1000
+    private val timeoutToken = 24 * 3600 * 1000
     private val timeoutRefreshToken = 30 * 60 * 1000
     private val algorithm: Algorithm =
             Algorithm.HMAC256(System.getenv("SECRET_SNAPPY").toByteArray())
@@ -42,7 +42,7 @@ class TokenSnappy(
             tokens["access_token"] = accessToken
             tokens["refresh_token"] = refreshToken
             sendResponse(response, tokens)
-        } catch (ex: Exception){
+        } catch (ex: Exception) {
             sendErrorResponse(response, ex.message ?: "Something went wrong")
         }
     }
@@ -78,9 +78,8 @@ class TokenSnappy(
     }
 
     fun getUserFromToken(authHeader: String): String {
-        val tokenBearer: String = authHeader.substring("Bearer ".length)
         val verifier: JWTVerifier = JWT.require(algorithm).build()
-        val decodedJWT: DecodedJWT = verifier.verify(tokenBearer)
+        val decodedJWT: DecodedJWT = verifier.verify(authHeader.substring("Bearer ".length))
         return decodedJWT.subject
     }
 
@@ -108,7 +107,10 @@ class TokenSnappy(
             if (profiles != null) {
                 UserLogged.getSession().removeUser(userdetail.username)
                 profiles.forEach { prof ->
-                    UserLogged.getSession().addProfile(userdetail.username, prof.profile.name, prof.business.id)
+                    UserLogged.getSession().addProfile(
+                            userdetail.username,
+                            prof.profile.name,
+                            prof.business.id)
                 }
             }
         }

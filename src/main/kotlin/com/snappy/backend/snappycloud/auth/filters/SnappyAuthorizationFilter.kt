@@ -14,7 +14,8 @@ class SnappyAuthorizationFilter(private val tokenUtils: TokenSnappy) : OncePerRe
             response: HttpServletResponse,
             filterChain: FilterChain,
     ) {
-        if ((request.servletPath == "/api/login") || (request.servletPath == "/api/token/refresh")) {
+        if ((request.servletPath == "/api/login") || (request.servletPath == "/api/token/refresh")
+                || (request.servletPath == "/api/user/update/password")) {
             filterChain.doFilter(request, response)
         } else {
             val authorizationHeader: String? = request.getHeader(HttpHeaders.AUTHORIZATION)
@@ -24,7 +25,6 @@ class SnappyAuthorizationFilter(private val tokenUtils: TokenSnappy) : OncePerRe
                     val businessId = request.getParameter("business")
                     if (businessId == null) tokenUtils.sendErrorResponse(response,
                             "Business ID was not specified")
-
                     tokenUtils.validateUser(authorizationHeader, businessId)
                     filterChain.doFilter(request, response)
                 } catch (ex: Exception) {

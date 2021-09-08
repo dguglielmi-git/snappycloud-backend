@@ -6,8 +6,7 @@ import com.snappy.backend.snappycloud.auth.filters.SnappyAuthorizationFilter
 import com.snappy.backend.snappycloud.constants.SnappyConst
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.HttpMethod.GET
-import org.springframework.http.HttpMethod.POST
+import org.springframework.http.HttpMethod.*
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -45,6 +44,7 @@ class SecurityConfig(
 
         http.authorizeRequests().antMatchers("/api/login/**", "/api/token/refresh").permitAll()
         http.authorizeRequests().antMatchers(POST, "/api/user/save/**").permitAll()
+        http.authorizeRequests().antMatchers(PUT, "/api/user/update/**").permitAll()
 
         http.authorizeRequests().antMatchers(GET, "/api/users/**")
                 .hasAnyAuthority(

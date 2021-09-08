@@ -22,44 +22,39 @@ class UserService(
 ) : UserDetailsService, IGenericService<User, Long> {
     private val passwordEncoder: PasswordEncoder = BCryptPasswordEncoder()
 
-    override fun save(user: User): User {
-        user.password = passwordEncoder.encode(user.password)
-        val year = Calendar.YEAR
-        val month = Calendar.MONTH
-        val day = Calendar.DAY_OF_MONTH
-        user.issueDate = GregorianCalendar(year, month, day)
+    override fun save(user: User): UserDTO {
+        user.password = user.password?.let { encode(it) }
+        user.issueDate = GregorianCalendar(
+                Calendar.YEAR,
+                Calendar.MONTH,
+                Calendar.DAY_OF_MONTH)
         user.active = 1
-        return this.userRepository.save(user)
+        return parseUserToDTO(this.userRepository.save(user))
     }
 
-    fun getById(id: Long): User? = this.userRepository.getById(id)
+    fun getById(id: Long): UserDTO? = parseUserToDTO(this.userRepository.getById(id))
 
-    fun findByUsername(username: String): User? = this.userRepository.findByUsername(username)
+    fun findByUsername(username: String): User? =
+            this.userRepository.findByUsername(username)
 
     override fun findAll(): List<UserDTO> {
         val users: MutableList<UserDTO> = mutableListOf()
         userRepository.findAll().forEach { user ->
-            users.add(UserDTO(
-                    user.id,
-                    user.employeeCode,
-                    user.username,
-                    user.name,
-                    user.surname,
-                    user.email,
-                    user.active,
-                    user.issueDateString,
-                    user.dniSsnNino
-            ))
+            users.add(parseUserToDTO(user))
         }
         return users.toList()
     }
 
     override fun findById(id: Long): User? = this.userRepository.findByIdOrNull(id)
 
-    override fun update(t: User): User {
-        return if (this.userRepository.existsById(t.id))
-            this.userRepository.save(t)
-        else throw EntityNotFoundException("${t.id} does not exist")
+    override fun update(t: User): UserDTO {
+        val user = this.userRepository.findByUsername(t.username)
+        if (user != null) {
+            t.password = user.password
+            return parseUserToDTO(this.userRepository.save(t))
+        } else {
+            throw  Exception("${t.id} does not exist")
+        }
     }
 
     override fun deleteById(id: Long): User {
@@ -70,11 +65,39 @@ class UserService(
 
     @Throws(UsernameNotFoundException::class)
     override fun loadUserByUsername(username: String): UserDetails {
-        val user = userRepository.findByUsername("dguglielmi")
+        val user = userRepository.findByUsername(username)
         if (user != null) {
             val authorities = mutableListOf<SimpleGrantedAuthority>()
             authorities.add(SimpleGrantedAuthority("ROLE"))
-            return org.springframework.security.core.userdetails.User(user.username, user.password, authorities)
+            return org.springframework.security.core.userdetails.User(
+                    user.username,
+                    user.password,
+                    authorities)
         } else throw UsernameNotFoundException("User not found in the database")
     }
+
+    fun updateUserPassword(user: String, pass: String) {
+        try {
+            val user = this.userRepository.findByUsername(user)
+            if (user != null) {
+                user.password = encode(pass)
+                this.update(user)
+            }
+        } catch (ex: Exception) {
+            throw Exception("User not found")
+        }
+    }
+
+    fun encode(str: String) = passwordEncoder.encode(str)
+
+    private fun parseUserToDTO(user: User): UserDTO =
+            UserDTO(user.id,
+                    user.employeeCode,
+                    user.username,
+                    user.name,
+                    user.surname,
+                    user.email,
+                    user.active,
+                    user.issueDateString,
+                    user.dniSsnNino)
 }

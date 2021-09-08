@@ -1,16 +1,24 @@
 package com.snappy.backend.snappycloud
 
 import com.snappy.backend.snappycloud.auth.UserLogged
+import com.snappy.backend.snappycloud.models.User
+import com.snappy.backend.snappycloud.utils.Common
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.stereotype.Component
+import java.util.*
+import kotlin.reflect.KMutableProperty
+import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.full.memberProperties
 
+@Component
 class RoleTest {
 
-    // Strategy Design Pattern
-
-
     @Test
-    fun `Test - Adding Role`() {
+    fun `Role Test - Adding Role`() {
         val usersLogged = UserLogged.getSession()
         usersLogged.addUser("dguglielmi")
 
@@ -25,7 +33,7 @@ class RoleTest {
     }
 
     @Test
-    fun `Test - User has a profile`() {
+    fun `Role Test - User has a profile`() {
         val usersLogged = UserLogged.getSession()
         usersLogged.addUser("dguglielmi")
         usersLogged.addProfile("dguglielmi", "ROLE_ROOT", 1)
@@ -39,7 +47,7 @@ class RoleTest {
     }
 
     @Test
-    fun `Test - Getting profiles from existing business`() {
+    fun `Role Test - Getting profiles from existing business`() {
         val usersLogged = UserLogged.getSession()
         usersLogged.resetProfiles(1)
         usersLogged.removeUser("testing")
@@ -56,7 +64,7 @@ class RoleTest {
     }
 
     @Test
-    fun `Test - User has not a profile`() {
+    fun `Role Test - User has not a profile`() {
         val usersLogged = UserLogged.getSession()
         usersLogged.addUser("dguglielmi")
         usersLogged.addProfile("dguglielmi", "ROLE_ROOT", 1)
@@ -71,7 +79,7 @@ class RoleTest {
 
 
     @Test
-    fun `Test - Getting NULL profiles from non existing business`() {
+    fun `Role Test - Getting NULL profiles from non existing business`() {
         val usersLogged = UserLogged.getSession()
         usersLogged.addUser("dguglielmi")
         usersLogged.addProfile("dguglielmi", "ROLE_ROOT", 1)
@@ -83,7 +91,7 @@ class RoleTest {
     }
 
     @Test
-    fun `Test - Verifying wrong profiles`() {
+    fun `Role Test - Verifying wrong profiles`() {
         val usersLogged = UserLogged.getSession()
         usersLogged.addUser("dguglielmi")
         usersLogged.addProfile("dguglielmi", "ROLE_ROOT", 1)
@@ -98,7 +106,7 @@ class RoleTest {
     }
 
     @Test
-    fun `Test - Verifying right profiles`() {
+    fun `Role Test - Verifying right profiles`() {
         val usersLogged = UserLogged.getSession()
         usersLogged.addUser("dguglielmi")
         usersLogged.addProfile("dguglielmi", "ROLE_ROOT", 1)
@@ -113,7 +121,7 @@ class RoleTest {
     }
 
     @Test
-    fun `Test - Remove an user`() {
+    fun `Role Test - Remove an user`() {
         val usersLogged = UserLogged.getSession()
         usersLogged.addUser("testing")
         usersLogged.addUser("john")
@@ -125,7 +133,7 @@ class RoleTest {
     }
 
     @Test
-    fun `Test - Check if User Exists`() {
+    fun `Role Test - Check if User Exists`() {
         val usersLogged = UserLogged.getSession()
         usersLogged.addUser("testing")
         usersLogged.addUser("john")
@@ -136,7 +144,7 @@ class RoleTest {
     }
 
     @Test
-    fun `Test - Check if User Does not exist`() {
+    fun `Role Test - Check if User Does not exist`() {
         val usersLogged = UserLogged.getSession()
         usersLogged.addUser("testing")
         usersLogged.addUser("john")
@@ -145,4 +153,15 @@ class RoleTest {
 
         Assertions.assertEquals(false, result)
     }
+
+    @Test
+    fun `dd`() {
+
+        val passwordEncoder: PasswordEncoder = BCryptPasswordEncoder()
+        println(passwordEncoder.encode("newTh8izhanv"))
+
+    }
+
+
+
 }
