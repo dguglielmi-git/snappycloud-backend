@@ -45,8 +45,10 @@ class SecurityConfig(
         http.authorizeRequests().antMatchers("/api/login/**", "/api/token/refresh").permitAll()
         http.authorizeRequests().antMatchers(POST, "/api/user/save/**").permitAll()
         http.authorizeRequests().antMatchers(PUT, "/api/user/update/**").permitAll()
+        http.authorizeRequests().antMatchers(DELETE,"/api/user/delete").permitAll()
 
-        http.authorizeRequests().antMatchers(GET, "/api/users/**")
+        http.authorizeRequests().antMatchers(GET,
+                "/api/users/**","/api/business/profiles/**")
                 .hasAnyAuthority(
                         SnappyConst.SNP_ROOT,
                         SnappyConst.SNP_ADMIN,
@@ -66,14 +68,6 @@ class SecurityConfig(
 
         http.authorizeRequests().antMatchers(POST,
                 "/api/profile/addUser/**")
-                .hasAnyAuthority(
-                        SnappyConst.SNP_ROOT,
-                        SnappyConst.SNP_ADMIN,
-                        SnappyConst.SNP_MANAGER
-                )
-
-        http.authorizeRequests().antMatchers(GET,
-                "/api/business/profiles/**")
                 .hasAnyAuthority(
                         SnappyConst.SNP_ROOT,
                         SnappyConst.SNP_ADMIN,

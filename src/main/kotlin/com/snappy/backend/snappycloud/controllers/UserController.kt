@@ -9,6 +9,7 @@ import com.snappy.backend.snappycloud.utils.Common
 import org.modelmapper.ModelMapper
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpHeaders.AUTHORIZATION
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
@@ -24,12 +25,12 @@ class UserController(
         private val tokenUtils: TokenSnappy,
         private val common: Common
 ) {
-
     @GetMapping("/users")
     fun getUsers(): ResponseEntity<List<UserDTO>> = ResponseEntity.ok().body(userService.findAll())
 
     @GetMapping("/user/{id}")
-    fun getUserById(@PathVariable id: Long, response: HttpServletResponse): ResponseEntity<UserDTO?> {
+    fun getUserById(@PathVariable id: Long, response: HttpServletResponse):
+            ResponseEntity<UserDTO?> {
         return try {
             ResponseEntity.ok().body(userService.getById(id))
         } catch (ex: Exception) {
@@ -46,7 +47,8 @@ class UserController(
     }
 
     @PutMapping("/user/update")
-    fun updateUser(@RequestBody user: UserDTO, response: HttpServletResponse): ResponseEntity<UserDTO> {
+    fun updateUser(@RequestBody user: UserDTO, response: HttpServletResponse):
+            ResponseEntity<UserDTO> {
         return try {
             val modelMapper = ModelMapper()
             val userParser = modelMapper.map(user, User::class.java)
@@ -63,8 +65,8 @@ class UserController(
     }
 
     @PutMapping("/user/update/password")
-    fun updatePassword(response: HttpServletResponse, request: HttpServletRequest): ResponseEntity<MessageDTO> {
-
+    fun updatePassword(response: HttpServletResponse, request: HttpServletRequest):
+            ResponseEntity<MessageDTO> {
         val authorizationHeader: String? = request.getHeader(HttpHeaders.AUTHORIZATION)
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             try {
@@ -77,6 +79,35 @@ class UserController(
             }
         }
         return ResponseEntity.badRequest().build()
+    }
+
+    @DeleteMapping("/user/delete")
+    fun deleteUser(response: HttpServletResponse, request: HttpServletRequest):
+            ResponseEntity<MessageDTO> {
+        val authorizationHeader: String? = request.getHeader(HttpHeaders.AUTHORIZATION)
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            try {
+                val userOnToken = tokenUtils.getUserFromToken(authorizationHeader)
+                val userToDelete = request.getParameter("username")
+
+                if (userOnToken == userToDelete) {
+                    val user = userService.findByUsername(userToDelete)
+                    if (user != null) {
+                        user.active = 0
+                        userService.update(user)
+                        return ResponseEntity.ok().body(MessageDTO(
+                                "User ${user.username} has been disabled."))
+                    } else {
+                        return ResponseEntity.notFound().build()
+                    }
+                } else {
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
+                }
+            } catch (ex: Exception) {
+                return ResponseEntity.badRequest().build()
+            }
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
     }
 
     @Throws(IOException::class)

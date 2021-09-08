@@ -35,7 +35,7 @@ class UserService(
     fun getById(id: Long): UserDTO? = parseUserToDTO(this.userRepository.getById(id))
 
     fun findByUsername(username: String): User? =
-            this.userRepository.findByUsername(username)
+            this.userRepository.findByUsernameAndActive(username,1)
 
     override fun findAll(): List<UserDTO> {
         val users: MutableList<UserDTO> = mutableListOf()
@@ -48,7 +48,7 @@ class UserService(
     override fun findById(id: Long): User? = this.userRepository.findByIdOrNull(id)
 
     override fun update(t: User): UserDTO {
-        val user = this.userRepository.findByUsername(t.username)
+        val user = this.userRepository.findByUsernameAndActive(t.username,1)
         if (user != null) {
             t.password = user.password
             return parseUserToDTO(this.userRepository.save(t))
@@ -65,7 +65,7 @@ class UserService(
 
     @Throws(UsernameNotFoundException::class)
     override fun loadUserByUsername(username: String): UserDetails {
-        val user = userRepository.findByUsername(username)
+        val user = userRepository.findByUsernameAndActive(username,1)
         if (user != null) {
             val authorities = mutableListOf<SimpleGrantedAuthority>()
             authorities.add(SimpleGrantedAuthority("ROLE"))
@@ -78,7 +78,7 @@ class UserService(
 
     fun updateUserPassword(user: String, pass: String) {
         try {
-            val user = this.userRepository.findByUsername(user)
+            val user = this.userRepository.findByUsernameAndActive(user,1)
             if (user != null) {
                 user.password = encode(pass)
                 this.update(user)

@@ -14,8 +14,10 @@ class SnappyAuthorizationFilter(private val tokenUtils: TokenSnappy) : OncePerRe
             response: HttpServletResponse,
             filterChain: FilterChain,
     ) {
-        if ((request.servletPath == "/api/login") || (request.servletPath == "/api/token/refresh")
-                || (request.servletPath == "/api/user/update/password")) {
+        if ((request.servletPath == "/api/login")
+                || (request.servletPath == "/api/token/refresh")
+                || (request.servletPath == "/api/user/update/password")
+                || (request.servletPath == "/api/user/delete")) {
             filterChain.doFilter(request, response)
         } else {
             val authorizationHeader: String? = request.getHeader(HttpHeaders.AUTHORIZATION)
