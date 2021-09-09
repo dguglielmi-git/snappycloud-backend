@@ -8,7 +8,6 @@ import com.snappy.backend.snappycloud.services.UserService
 import com.snappy.backend.snappycloud.utils.Common
 import org.modelmapper.ModelMapper
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -62,11 +61,10 @@ class UserController(
     }
 
     @PutMapping("/user/update/password")
-    fun updatePassword(response: HttpServletResponse, request: HttpServletRequest):
-            ResponseEntity<MessageDTO> {
+    fun updatePassword(request: HttpServletRequest): ResponseEntity<MessageDTO> {
         try {
             val username = tokenUtils.getUserFromToken(getBearer(request))
-            val password = getParameterFromHeader(request, "password")
+            val password = request.getParameter("password")
             userService.updateUserPassword(username, password)
             return ResponseEntity.ok().body(MessageDTO("User password updated."))
         } catch (ex: Exception) {
@@ -75,27 +73,18 @@ class UserController(
     }
 
     @DeleteMapping("/user/delete")
-    fun deleteUser(response: HttpServletResponse, request: HttpServletRequest):
-            ResponseEntity<MessageDTO> {
-        val authorizationHeader: String? = request.getHeader(HttpHeaders.AUTHORIZATION)
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            try {
-                val userOnToken = tokenUtils.getUserFromToken(getBearer(request))
-                val userToDelete = getParameterFromHeader(request, "username")
+    fun deleteUser(request: HttpServletRequest): ResponseEntity<MessageDTO> {
+        try {
+            val userOnToken = tokenUtils.getUserFromToken(getBearer(request))
 
-                if (userOnToken == userToDelete) {
-                    userService.findByUsername(userToDelete)?.let {
-                        it.active = 0
-                        userService.update(it)
-                        return ResponseEntity.ok().body(MessageDTO("User has been disabled."))
-                    }
-                } else {
-                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
-                }
-            } catch (ex: Exception) {
-                println(ex)
-                return ResponseEntity.badRequest().build()
+            userService.findByUsername(userOnToken)?.let {
+                it.active = 0
+                userService.update(it)
+                return ResponseEntity.ok().body(MessageDTO("User has been disabled."))
             }
+        } catch (ex: Exception) {
+            println(ex)
+            return ResponseEntity.badRequest().build()
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
     }
@@ -103,21 +92,14 @@ class UserController(
     @Throws(IOException::class)
     @GetMapping("/token/refresh")
     fun refreshToken(request: HttpServletRequest, response: HttpServletResponse) {
-        val authorizationHeader: String? = request.getHeader(AUTHORIZATION)
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            try {
-                val url: String = request.requestURL.toString()
-                tokenUtils.sendRefreshTokens(authorizationHeader, url, response)
-            } catch (ex: Exception) {
-                tokenUtils.sendErrorResponse(response, ex.message ?: "Something went wrong")
+        try {
+            request.requestURL.toString().let {
+                tokenUtils.sendRefreshTokens(getBearer(request), it, response)
             }
-        } else {
-            throw RuntimeException("Refresh token is missing")
+        } catch (ex: Exception) {
+            tokenUtils.sendErrorResponse(response, ex.message ?: "Something went wrong")
         }
     }
-
-    private fun getParameterFromHeader(request: HttpServletRequest, param: String) =
-            request.getParameter(param)
 
     private fun getBearer(request: HttpServletRequest): String {
         val authorizationHeader: String? = request.getHeader(HttpHeaders.AUTHORIZATION)
