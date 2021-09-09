@@ -83,7 +83,6 @@ class UserController(
                 return ResponseEntity.ok().body(MessageDTO("User has been disabled."))
             }
         } catch (ex: Exception) {
-            println(ex)
             return ResponseEntity.badRequest().build()
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
