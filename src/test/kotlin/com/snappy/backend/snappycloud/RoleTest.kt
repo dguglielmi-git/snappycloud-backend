@@ -66,20 +66,20 @@ class RoleTest {
     @Test
     fun `Role Test - User has not a profile`() {
         val usersLogged = UserLogged.getSession()
-        usersLogged.addUser("dguglielmi")
-        usersLogged.addProfile("dguglielmi", "ROLE_ROOT", 1)
-        usersLogged.addProfile("dguglielmi", "ROLE_ADMIN", 1)
+        usersLogged.addUser("test")
+        usersLogged.addProfile("test", "ROLE_ROOT", 1)
+        usersLogged.addProfile("test", "ROLE_ADMIN", 1)
 
         val profileToCheck = arrayOf("ROLE_COOL")
 
-        val result = usersLogged.hasProfile("dguglielmi", profileToCheck, 1)
+        val result = usersLogged.hasProfile("test", profileToCheck, 1)
 
         Assertions.assertEquals(false, result)
     }
 
 
     @Test
-    fun `Role Test - Getting NULL profiles from non existing business`() {
+    fun `Role Test - Getting EMPTY profiles from non existing business`() {
         val usersLogged = UserLogged.getSession()
         usersLogged.addUser("dguglielmi")
         usersLogged.addProfile("dguglielmi", "ROLE_ROOT", 1)
@@ -87,7 +87,7 @@ class RoleTest {
 
         val result = usersLogged.getProfiles("dguglielmi", 2)
 
-        Assertions.assertArrayEquals(null, result)
+        Assertions.assertArrayEquals(arrayOf(""), result)
     }
 
     @Test
@@ -133,13 +133,25 @@ class RoleTest {
     }
 
     @Test
+    fun `Role Test - Remove a profile`() {
+        val usersLogged = UserLogged.getSession()
+        usersLogged.addProfile("test", "TEST_ROLE", 99)
+        val result = usersLogged.getProfiles("test", 99)
+        Assertions.assertArrayEquals(arrayOf("TEST_ROLE"), result)
+
+        usersLogged.removeProfile("test", "TEST_ROLE", 99)
+        val result2 = usersLogged.getProfiles("test", 99)
+        println(result2.toString())
+        Assertions.assertArrayEquals(arrayOf(), result2)
+    }
+
+    @Test
     fun `Role Test - Check if User Exists`() {
         val usersLogged = UserLogged.getSession()
         usersLogged.addUser("testing")
         usersLogged.addUser("john")
 
         val result = usersLogged.isUser("testing")
-
         Assertions.assertEquals(true, result)
     }
 
@@ -150,18 +162,7 @@ class RoleTest {
         usersLogged.addUser("john")
 
         val result = usersLogged.isUser("jack")
-
         Assertions.assertEquals(false, result)
     }
-
-    @Test
-    fun `dd`() {
-
-        val passwordEncoder: PasswordEncoder = BCryptPasswordEncoder()
-        println(passwordEncoder.encode("newTh8izhanv"))
-
-    }
-
-
 
 }
