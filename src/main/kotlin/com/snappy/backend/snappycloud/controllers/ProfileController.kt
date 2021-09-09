@@ -1,15 +1,8 @@
 package com.snappy.backend.snappycloud.controllers
 
-import com.snappy.backend.snappycloud.constants.SnappyConst
-import com.snappy.backend.snappycloud.dtos.ProfileToUserDTO
-import com.snappy.backend.snappycloud.models.Profile
-import com.snappy.backend.snappycloud.models.UserBusinessRole
 import com.snappy.backend.snappycloud.services.ProfileService
-import com.snappy.backend.snappycloud.services.UserBusinessRoleService
-import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder
-import java.net.URI
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api")

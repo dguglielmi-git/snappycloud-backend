@@ -6,9 +6,9 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.snappy.backend.snappycloud.dtos.TokenDTO
-import com.snappy.backend.snappycloud.models.UserBusinessRole
 import com.snappy.backend.snappycloud.services.UserBusinessRoleService
 import com.snappy.backend.snappycloud.services.UserService
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -17,11 +17,12 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import java.util.*
+import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @Component
 class TokenSnappy(
-        private val service: UserService,
+        private val userService: UserService,
         private val userBusinessRoleService: UserBusinessRoleService,
 ) {
     private val timeoutToken = 24 * 3600 * 1000
@@ -36,50 +37,43 @@ class TokenSnappy(
             val user: org.springframework.security.core.userdetails.User =
                     authentication.principal as org.springframework.security.core.userdetails.User
             loadUserProfiles(user)
-            val accessToken: String = getAccessToken(user.username, requestURL)
-            val refreshToken: String = getRefreshToken(user.username, requestURL)
-            val tokens = mutableMapOf<String, String>()
-            tokens["access_token"] = accessToken
-            tokens["refresh_token"] = refreshToken
-            sendResponse(response, tokens)
+            sendResponse(response, getTokenAndRefreshToken(user.username, requestURL))
         } catch (ex: Exception) {
             sendErrorResponse(response, ex.message ?: "Something went wrong")
         }
     }
 
+    private fun getTokenAndRefreshToken(user: String, url: String): TokenDTO =
+            TokenDTO(getAccessToken(user, url), getRefreshToken(user, url))
+
     fun sendRefreshTokens(
-            authHeader: String,
+            request: HttpServletRequest,
             url: String, response: HttpServletResponse
     ) {
         try {
-            val username: String = getUserFromToken(authHeader)
-            val user: com.snappy.backend.snappycloud.models.User? = service.findByUsername(username)
-            val refreshToken: String = authHeader.substring("Bearer ".length)
+            val username: String = getUserFromToken(request)
+            val user: com.snappy.backend.snappycloud.models.User? = userService.findByUsername(username)
+            val refreshToken: String = getBearer(request).substring("Bearer ".length)
             val accessToken: String = if (user != null) getAccessToken(user.username, url) else ""
 
-            val tokens = mutableMapOf<String, String>()
-            tokens["access_token"] = accessToken
-            tokens["refresh_token"] = refreshToken
-            val tokensResponse = TokenDTO(
-                    tokens["access_token"] ?: "not access token found",
-                    tokens["refresh_token"] ?: "not refresh token found")
+            val tokensResponse = TokenDTO(accessToken, refreshToken)
             sendResponse(response, tokensResponse)
         } catch (ex: Exception) {
             sendErrorResponse(response, ex.message ?: "Something went wrong")
         }
     }
 
-    fun validateUser(authorizationHeader: String, businessId: String) {
-        val username = getUserFromToken(authorizationHeader)
+    fun validateUser(request: HttpServletRequest, businessId: String) {
+        val username = getUserFromToken(request)
         val authorities = getAuthorities(username, businessId)
         val authenticationToken =
                 UsernamePasswordAuthenticationToken(username, null, authorities)
         SecurityContextHolder.getContext().authentication = authenticationToken
     }
 
-    fun getUserFromToken(authHeader: String): String {
+    fun getUserFromToken(request: HttpServletRequest): String {
         val verifier: JWTVerifier = JWT.require(algorithm).build()
-        val decodedJWT: DecodedJWT = verifier.verify(authHeader.substring("Bearer ".length))
+        val decodedJWT: DecodedJWT = verifier.verify(getBearer(request).substring("Bearer ".length))
         return decodedJWT.subject
     }
 
@@ -99,14 +93,18 @@ class TokenSnappy(
         sendResponse(response, error)
     }
 
+    private fun getBearer(request: HttpServletRequest): String {
+        val authorizationHeader: String? = request.getHeader(HttpHeaders.AUTHORIZATION)
+        return if (authorizationHeader != null && authorizationHeader.startsWith("Bearer "))
+            authorizationHeader
+        else ""
+    }
+
     private fun loadUserProfiles(user: org.springframework.security.core.userdetails.User) {
-        val userdetail = service.findByUsername(user.username)
-        if (userdetail != null) {
-            val profiles: Array<UserBusinessRole>? =
-                    userBusinessRoleService.findByUser(userdetail.id)
-            if (profiles != null) {
+        userService.findByUsername(user.username)?.let { userdetail ->
+            userBusinessRoleService.findByUser(userdetail.id)?.let {
                 UserLogged.getSession().removeUser(userdetail.username)
-                profiles.forEach { prof ->
+                it.forEach { prof ->
                     UserLogged.getSession().addProfile(
                             userdetail.username,
                             prof.profile.name,

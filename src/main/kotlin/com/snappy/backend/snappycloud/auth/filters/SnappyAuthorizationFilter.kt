@@ -20,20 +20,15 @@ class SnappyAuthorizationFilter(private val tokenUtils: TokenSnappy) : OncePerRe
                 || (request.servletPath == "/api/user/delete")) {
             filterChain.doFilter(request, response)
         } else {
-            val authorizationHeader: String? = request.getHeader(HttpHeaders.AUTHORIZATION)
-            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            try {
+                val businessId = request.getParameter("business")
+                if (businessId == null)
+                    tokenUtils.sendErrorResponse(response, "Business ID was not specified")
 
-                try {
-                    val businessId = request.getParameter("business")
-                    if (businessId == null) tokenUtils.sendErrorResponse(response,
-                            "Business ID was not specified")
-                    tokenUtils.validateUser(authorizationHeader, businessId)
-                    filterChain.doFilter(request, response)
-                } catch (ex: Exception) {
-                    tokenUtils.sendErrorResponse(response, ex.message ?: "Something went wrong.")
-                }
-            } else {
+                tokenUtils.validateUser(request, businessId)
                 filterChain.doFilter(request, response)
+            } catch (ex: Exception) {
+                tokenUtils.sendErrorResponse(response, ex.message ?: "Something went wrong.")
             }
         }
     }

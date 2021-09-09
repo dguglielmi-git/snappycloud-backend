@@ -7,7 +7,6 @@ import com.snappy.backend.snappycloud.models.User
 import com.snappy.backend.snappycloud.services.UserService
 import com.snappy.backend.snappycloud.utils.Common
 import org.modelmapper.ModelMapper
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -63,7 +62,7 @@ class UserController(
     @PutMapping("/user/update/password")
     fun updatePassword(request: HttpServletRequest): ResponseEntity<MessageDTO> {
         try {
-            val username = tokenUtils.getUserFromToken(getBearer(request))
+            val username = tokenUtils.getUserFromToken(request)
             val password = request.getParameter("password")
             userService.updateUserPassword(username, password)
             return ResponseEntity.ok().body(MessageDTO("User password updated."))
@@ -75,7 +74,7 @@ class UserController(
     @DeleteMapping("/user/delete")
     fun deleteUser(request: HttpServletRequest): ResponseEntity<MessageDTO> {
         try {
-            val userOnToken = tokenUtils.getUserFromToken(getBearer(request))
+            val userOnToken = tokenUtils.getUserFromToken(request)
 
             userService.findByUsername(userOnToken)?.let {
                 it.active = 0
@@ -93,17 +92,10 @@ class UserController(
     fun refreshToken(request: HttpServletRequest, response: HttpServletResponse) {
         try {
             request.requestURL.toString().let {
-                tokenUtils.sendRefreshTokens(getBearer(request), it, response)
+                tokenUtils.sendRefreshTokens(request, it, response)
             }
         } catch (ex: Exception) {
             tokenUtils.sendErrorResponse(response, ex.message ?: "Something went wrong")
         }
-    }
-
-    private fun getBearer(request: HttpServletRequest): String {
-        val authorizationHeader: String? = request.getHeader(HttpHeaders.AUTHORIZATION)
-        return if (authorizationHeader != null && authorizationHeader.startsWith("Bearer "))
-            authorizationHeader
-        else ""
     }
 }
