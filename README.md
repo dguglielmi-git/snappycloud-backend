@@ -15,7 +15,7 @@ Snappy Architecture combines several technologies, and it is divided in differen
 * [Snappy Standalone App](#) - (ElectronJS) - It is used by the operational level of the organization: seller, supervisors, and every user role that needs to do operational tasks.
 * [Snappy Mobile App](#) - (React Native)
 
-*Notes: The [Snappy Standalone Application](#) is being migrated from its old version written in Java. It is currently deprecated and no more available for downloading.
+*Notes: The [Snappy Standalone Application](#) is being migrated from its old version built in Java. It is currently deprecated and is no longer available for downloading.
 
 # Architecture Diagram
 ![Architecture](architectureDiagram.png)
